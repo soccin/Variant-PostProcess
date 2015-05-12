@@ -61,9 +61,12 @@ with open(origMAFFile) as fp:
             r["t_depth"]=str(int(r["t_alt_count"])+int(r["t_ref_count"]))
         r["t_var_freq"]=float(r["t_alt_count"])/float(r["t_depth"])
 
-        if r["n_depth"]=="":
-            r["n_depth"]=str(int(r["n_alt_count"])+int(r["n_ref_count"]))
-        r["n_var_freq"]=float(r["n_alt_count"])/float(r["n_depth"])
+        if r["n_alt_count"]=="":
+            r["n_var_freq"]=""
+        else:
+            if r["n_depth"]=="":
+                r["n_depth"]=str(int(r["n_alt_count"])+int(r["n_ref_count"]))
+            r["n_var_freq"]=float(r["n_alt_count"])/float(r["n_depth"])
 
         events[label]=r
 
