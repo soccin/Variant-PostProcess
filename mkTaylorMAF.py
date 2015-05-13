@@ -9,6 +9,9 @@ def cvtChrom(x):
     else:
         return x
 
+#if len(sys.argv)!=5:
+#    print >>sys.stderr, "Usage: mkTaylorMAF.py TriNucFile IMPACT410 ExAC OrigMAF"
+
 seqDataFile=sys.argv[1]
 impact410File=sys.argv[2]
 origMAFFile=sys.argv[3]
