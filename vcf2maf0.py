@@ -1,4 +1,4 @@
-#!/opt/common/CentOS_6/python/python-2.7.8/bin/python
+#!/opt/common/CentOS_6/python/python-2.7.7/bin/python
 """ convert vcf to pseudo-MAF format
 
 """
@@ -40,11 +40,11 @@ if len(sys.argv) <= 1:
 -v, --verbose: If specified, create a verbose maf that includes vcf entries with no reads"""
     sys.exit()
 if callers.has_key(args.caller):
-    1 
+    1
 else:
     choices = callers.keys()
     choices.sort()
-    choices = ",".join(choices) 
+    choices = ",".join(choices)
     print >>sys.stderr, "The caller", args.caller, "is not a valid choice. Valid caller options are: ", choices
     sys.exit()
 
@@ -89,7 +89,7 @@ if callers[args.caller] == "MUT":
   if not mutectText:
     arInput = input.split(".")
     arInput[-1] = "txt"
-    mutectText = ".".join(arInput) 
+    mutectText = ".".join(arInput)
   parser.parseAdditionalFile(mutectText)
   parser.trimPairmap()
 elif (callers[args.caller] == "VAR" and args.normal) or callers[args.caller] ==  "SS" or callers[args.caller] == "STR":
