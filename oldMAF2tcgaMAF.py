@@ -81,6 +81,24 @@ with open(args.maf1, 'w') as output:
         t_alt_count=rec.AD_ALT,
         Caller=rec.CALLER
       )
+
+      #
+      # Fix mutation signature for INS/DEL
+      # to confirm to TCGA standard
+      #
+
+      if maf.Variant_Type=="DEL":
+        maf.Start_Position=str(int(maf.Start_Position)+1)
+        maf.Reference_Allele=maf.Reference_Allele[1:]
+        if len(maf.Tumor_Seq_Allele1)>1:
+          maf.Tumor_Seq_Allele1=maf.Tumor_Seq_Allele1[1:]
+        else:
+          maf.Tumor_Seq_Allele1="-"
+      elif maf.Variant_Type=="INS":
+        maf.End_Position=str(int(maf.End_Position)+1)
+        maf.Reference_Allele="-"
+        maf.Tumor_Seq_Allele1=maf.Tumor_Seq_Allele1[1:]
+
       if hasattr(rec, "NORM_AD_REF"):
         maf.n_ref_count=rec.NORM_AD_REF
         maf.n_alt_count=rec.NORM_AD_ALT
