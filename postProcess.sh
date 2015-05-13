@@ -82,12 +82,10 @@ if [ ! -f "$TDIR/merge_maf3" ]; then
     cat $TDIR/*___DMPFilter_TCGA_MAF.txt | egrep -v "^Hugo_Symbol" | cut -f-39 >>$TDIR/merge_maf3
 fi
 
+echo "Done with Mutect"
+
 if [ ! -f "$TDIR/merge_maf3.vep" ]; then
 
-
-$SDIR/maf2vcfSimple.sh $TDIR/merge_maf3.vep >$TDIR/merge_maf3.vcf
-/home/socci/Code/Pipelines/Post/MAFFillOut/fillOutMAF_CBE.sh \
-    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
 
 /opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2maf.pl \
     --vep-forks 12 \
@@ -99,6 +97,10 @@ $SDIR/maf2vcfSimple.sh $TDIR/merge_maf3.vep >$TDIR/merge_maf3.vcf
 	--input-maf $TDIR/merge_maf3 \
 	--output-maf $TDIR/merge_maf3.vep
 
+$SDIR/maf2vcfSimple.sh $TDIR/merge_maf3.vep >$TDIR/merge_maf3.vcf
+/home/socci/Code/Pipelines/Post/MAFFillOut/fillOutMAF_CBE.sh \
+    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
+FILLOUT_CPID=$!
 fi
 
 cat $TDIR/merge_maf3.vep \
@@ -117,6 +119,9 @@ $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/merge_maf3.vep \
     > ${PROJECT}___SOMATIC.vep.maf
 
-echo "Waiting for "$GERMLINE_CPID
+echo "Waiting for GERMLINE "$GERMLINE_CPID
 wait $GERMLINE_CPID
+echo "DONE"
+echo "Waiting for FILL "$FILLOUT_CPID
+wait $FILLOUT_CPID
 echo "DONE"
