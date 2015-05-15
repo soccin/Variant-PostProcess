@@ -24,6 +24,7 @@ with open(MAFFILE) as fp:
     for r in cin:
         key=(r["Chromosome"],r["Start_Position"],r["End_Position"],
             r["Reference_Allele"],r["Tumor_Seq_Allele2"])
+
         mafEvents[key][r["Tumor_Sample_Barcode"]]=r
         mafSamples[key].add(r["Tumor_Sample_Barcode"])
         mafSamples[key].add(r["Matched_Norm_Sample_Barcode"])
@@ -46,16 +47,32 @@ else:
 eventDb=dict()
 samples=sorted(sampleDb)
 
-for rec in cin:
-    r=Bunch(rec)
-    delta=len(r.Ref)-len(r.Alt)
+def vcf2mafEvent(chrom,pos,ref,alt):
+    delta=len(ref)-len(alt)
+    refN=ref
+    altN=alt
     if delta==0:
         endPos=r.Pos
+        startPos=r.Pos
     elif delta>0:
-        endPos=str(int(r.Pos)+len(r.Ref)-1)
+        endPos=str(int(r.Pos)+len(refN)-1)
+        startPos=str(int(r.Pos)+1)
+        refN=refN[1:]
+        if len(altN)==1:
+            altN='-'
+        else:
+            altN=altN[1:]
     else:
-        endPos=str(int(r.Pos)+len(r.Ref))
-    key=(r.Chrom,r.Pos,endPos,r.Ref,r.Alt)
+        endPos=str(int(r.Pos)+1)
+        startPos=r.Pos
+        refN="-"
+        altN=altN[1:]
+    return (chrom,startPos,endPos,refN,altN)
+
+for rec in cin:
+    r=Bunch(rec)
+    (chrom,startPos,endPos,ref,alt)=vcf2mafEvent(r.Chrom,r.Pos,r.Ref,r.Alt)
+    key=(chrom,startPos,endPos,ref,alt)
 
     s1=mafEvents[key].keys()[0]
     rec1=mafEvents[key][s1]
