@@ -113,7 +113,7 @@ $BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/merge_m
     -fi $GENOME -fo $TDIR/merge_maf3.seq -bed -
 
 $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
-    -b $SDIR/db/IMPACT_410_hg19_targets.bed -wa \
+    -b $SDIR/db/IMPACT_410_hg19_targets_plus3bp.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/merge_maf3.impact410
 
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/merge_maf3.vep \

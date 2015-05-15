@@ -47,7 +47,7 @@ $BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/germlin
     -fi $GENOME -fo $TDIR/germline.maf2.seq -bed -
 
 $BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
-    -b $SDIR/db/IMPACT_410_hg19_targets.bed -wa \
+    -b $SDIR/db/IMPACT_410_hg19_targets_plus3bp.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/germline.maf2.impact410
 
 $SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline.maf2.vep \
