@@ -3,7 +3,7 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
 VEPPATH=/opt/common/CentOS_6/vep/v79
-GENOME=/common/data/assemblies/H.sapiens/hg19/hg19.fasta
+GENOME=/ifs/depot/assemblies/H.sapiens/hg19/hg19.fasta
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 
 PROJECT=$1
@@ -47,7 +47,7 @@ $BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/germlin
     -fi $GENOME -fo $TDIR/germline.maf2.seq -bed -
 
 $BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
-    -b /ifs/data/socci/Work/SeqAna/Db/Target/hg19/IMPACT_410_hg19/IMPACT_410_hg19_targets.bed -wa \
+    -b $SDIR/db/IMPACT_410_hg19_targets.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/germline.maf2.impact410
 
 $SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline.maf2.vep \
