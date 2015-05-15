@@ -110,10 +110,10 @@ cat $TDIR/merge_maf3.vep \
 
 $BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/merge_maf3.bed \
     | $BEDTOOLS getfasta -tab \
-    -fi /ifs/data/bio/assemblies/H.sapiens/hg19/hg19.fasta -fo $TDIR/merge_maf3.seq -bed -
+    -fi $GENOME -fo $TDIR/merge_maf3.seq -bed -
 
 $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
-    -b /ifs/data/socci/Work/SeqAna/Db/Target/hg19/IMPACT_410_hg19/IMPACT_410_hg19_targets.bed -wa \
+    -b $SDIR/db/IMPACT_410_hg19_targets.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/merge_maf3.impact410
 
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/merge_maf3.vep \
