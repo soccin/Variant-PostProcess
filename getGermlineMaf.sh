@@ -24,9 +24,10 @@ $SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
 $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/germline.maf1 $TDIR/germline.maf2
 
 if [ ! -f "$TDIR/germline.maf2.vep" ]; then
+    mkdir -p $TDIR/GERM
     /opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2maf.pl \
     --vep-forks 12 \
-    --tmp-dir /scratch/socci \
+    --tmp-dir $TDIR/GERM \
     --vep-path $VEPPATH \
     --vep-data $VEPPATH \
     --ref-fasta $TDIR/$(basename $GENOME) \

@@ -86,10 +86,10 @@ echo "Done with Mutect"
 
 if [ ! -f "$TDIR/merge_maf3.vep" ]; then
 
-
+mkdir -p $TDIR/SOM
 /opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2maf.pl \
     --vep-forks 12 \
-	--tmp-dir /scratch/socci \
+    --tmp-dir $TDIR/SOM \
     --vep-path $VEPPATH \
 	--vep-data $VEPPATH \
 	--ref-fasta $TDIR/$(basename $GENOME) \
@@ -97,7 +97,14 @@ if [ ! -f "$TDIR/merge_maf3.vep" ]; then
 	--input-maf $TDIR/merge_maf3 \
 	--output-maf $TDIR/merge_maf3.vep
 
-$SDIR/maf2vcfSimple.sh $TDIR/merge_maf3.vep >$TDIR/merge_maf3.vcf
+$SDIR/maf2vcfSimple.sh $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
+cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf
+$SDIR/bgzip $TDIR/maf3.vcf
+$SDIR/tabix -p vcf $TDIR/maf3.vcf.gz
+/opt/common/CentOS_6/bcftools/bcftools-1.2/bin/bcftools \
+    annotate --annotations /ifs/data/kandoth/srv/ExAC.r0.3.sites.pass.minus_somatic.vcf.gz \
+    --columns AC,AN,AF --output-type v --output $TDIR/maf3.exac.vcf $TDIR/maf3.vcf.gz
+
 /home/socci/Code/Pipelines/Post/MAFFillOut/fillOutMAF_CBE.sh \
     $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
 FILLOUT_CPID=$!
@@ -115,6 +122,8 @@ $BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/merge_m
 $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
     -b $SDIR/db/IMPACT_410_hg19_targets_plus3bp.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/merge_maf3.impact410
+
+
 
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/merge_maf3.vep \
     > ${PROJECT}___SOMATIC.vep.maf

@@ -61,6 +61,7 @@ with open(origMAFFile) as fp:
         r["IMPACT_410"]="T" if pos in impact410 else "F"
 
         if r["t_depth"]=="":
+            print >>sys.stderr, label
             r["t_depth"]=str(int(r["t_alt_count"])+int(r["t_ref_count"]))
         r["t_var_freq"]=float(r["t_alt_count"])/float(r["t_depth"])
 
