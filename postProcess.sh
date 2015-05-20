@@ -22,6 +22,15 @@ mkdir -p $TDIR
 ln -s $GENOME $TDIR/$(basename $GENOME)
 
 HAPLOTYPEVCF=$(ls $PIPEOUT/variants/haplotypecaller/*_HaplotypeCaller.vcf)
+
+if [ ! -f "$HAPLOTYPEVCF" ]; then
+    echo
+    echo FATAL ERROR Can not find Haplotype file in directory
+    echo $PIPEOUT/variants/haplotypecaller
+    echo
+    exit
+fi
+
 PROJECT=$(basename $HAPLOTYPEVCF | sed 's/_HaplotypeCaller.vcf//')
 echo PROJECT=$PROJECT
 
