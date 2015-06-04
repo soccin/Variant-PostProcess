@@ -15,10 +15,10 @@ if [ ! -f "$TDIR/$(basename $GENOME)" ]; then
 fi
 
 if [ ! -f "$TDIR/germline.maf0" ]; then
-    echo "Generating MAF0"
+    echo $0 "Generating MAF0"
     $SDIR/vcf2maf0.py -c haplotypecaller -i $VCF -o $TDIR/germline.maf0
 fi
-echo "MAF0 ready"
+echo $0 "MAF0 ready"
 
 $SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
 $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/germline.maf1 $TDIR/germline.maf2
@@ -36,7 +36,7 @@ if [ ! -f "$TDIR/germline.maf2.vep" ]; then
     --output-maf $TDIR/germline.maf2.vep
 fi
 
-echo "MAF2.VEP ready"
+echo $0 "MAF2.VEP ready"
 
 cat $TDIR/germline.maf2.vep \
     | egrep -v "(^#|^Hugo_Symbol)" \
@@ -50,6 +50,8 @@ $BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/germlin
 $BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
     -b $SDIR/db/IMPACT_410_hg19_targets_plus3bp.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/germline.maf2.impact410
+
+echo $0 "Making final MAF"
 
 $SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline.maf2.vep \
     > ${PROJECT}___GERMLINE.vep.maf

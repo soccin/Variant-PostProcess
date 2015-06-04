@@ -5,7 +5,7 @@ VARIANTSPIPEDIR=/home/socci/Code/Pipelines/CBE/Variant/variants_pipeline
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 VEPPATH=/opt/common/CentOS_6/vep/v79
 GENOME=/common/data/assemblies/H.sapiens/hg19/hg19.fasta
-
+EXACDB=/ifs/work/socci/Depot/Pipelines/Variant/PostProcess/db/ExAC.r0.3.sites.pass.minus_somatic.vcf.gz
 
 if [ $# -ne 2 ]; then
 	echo "usage: postProcess.sh PairingFile PipelineOutputDir"
@@ -39,7 +39,7 @@ echo PROJECT=$PROJECT
 #
 
 if [ ! -f "$TDIR/germline.maf2.vep" ]; then
-    echo "Getting Germline MAF"
+    echo $0 "Getting Germline MAF"
     $SDIR/getGermlineMaf.sh ${PROJECT} $HAPLOTYPEVCF $TDIR &
     GERMLINE_CPID=$!
 fi
@@ -54,14 +54,14 @@ if [ ! -f "$TDIR/$HAPMAF" ]; then
     $SDIR/indelOnly.py <$TDIR/hap_maf2 >$TDIR/$HAPMAF
 fi
 
-echo "Done with haplotype processing ..."
+echo $0 "Done with haplotype processing ..."
 
 #
 # Get DMP re-filtered MAF from mutect
 #
 
 MUTECTDIR=$PIPEOUT/variants/mutect
-echo $MUTECTDIR
+echo $0 $MUTECTDIR
 
 if [ ! -f "$TDIR/merge_maf3" ]; then
     for vcf in $MUTECTDIR/*vcf; do
@@ -79,7 +79,7 @@ if [ ! -f "$TDIR/merge_maf3" ]; then
     done
 
     echo
-    echo "Done with mutect rescue"
+    echo $0 "Done with mutect rescue"
     echo
 
 
@@ -91,7 +91,7 @@ if [ ! -f "$TDIR/merge_maf3" ]; then
     cat $TDIR/*___DMPFilter_TCGA_MAF.txt | egrep -v "^Hugo_Symbol" | cut -f-39 >>$TDIR/merge_maf3
 fi
 
-echo "Done with Mutect"
+echo $0 "Done with Mutect"
 
 if [ ! -f "$TDIR/merge_maf3.vep" ]; then
 
@@ -111,7 +111,7 @@ cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf
 $SDIR/bgzip $TDIR/maf3.vcf
 $SDIR/tabix -p vcf $TDIR/maf3.vcf.gz
 /opt/common/CentOS_6/bcftools/bcftools-1.2/bin/bcftools \
-    annotate --annotations /ifs/data/kandoth/srv/ExAC.r0.3.sites.pass.minus_somatic.vcf.gz \
+    annotate --annotations $EXACDB \
     --columns AC,AN,AF --output-type v --output $TDIR/maf3.exac.vcf $TDIR/maf3.vcf.gz
 
 /home/socci/Code/Pipelines/Post/MAFFillOut/fillOutMAF_CBE.sh \
@@ -137,9 +137,9 @@ $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/merge_maf3.vep \
     > ${PROJECT}___SOMATIC.vep.maf
 
-echo "Waiting for GERMLINE "$GERMLINE_CPID
+echo $0 "Waiting for GERMLINE "$GERMLINE_CPID
 wait $GERMLINE_CPID
-echo "DONE"
-echo "Waiting for FILL "$FILLOUT_CPID
+echo $0 "DONE"
+echo $0 "Waiting for FILL "$FILLOUT_CPID
 wait $FILLOUT_CPID
-echo "DONE"
+echo $0 "DONE"

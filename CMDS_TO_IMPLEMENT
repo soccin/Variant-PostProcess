@@ -1,0 +1,14 @@
+cat facets/facets__Proj_5513__cval__300__cncf.txt  | egrep -v "^ID" | awk '{print "chr"$2,$3-1,$4" "$0}' | sed 's/chr23/chrX/' | sed 's/chr24/chrY/' | tr '\t' '|' | tr ' ' '\t'  >facets.bed
+
+bedtools intersect -loj -a _scratch/merge_maf3.bed -b facets.bed | sort | uniq >join_maf_facets.txt
+
+
+
+./src/bcftools/bcftools annotate --annotations /ifs/data/kandoth/srv/ExAC.r0.3.sites.pass.minus_somatic.vcf.gz --columns AC,AN,AF --output-type v --output maf3.exac.vcf maf3.vcf.gz
+
+python PostProcess/zeng2MAFFill/ _scratch/merge_maf3.vep _scratch/fillOut.out >Proj_5513___FILLOUT.vep.maf
+
+ perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2vcf.pl --input-maf _scratch/merge_maf3 --output-dir _scratch/FILL --ref-fasta _scratch/hg19.fasta
+
+(cat _scratch/FILL/s_TS01_T_vs_s_TS01_N.vcf | fgrep "#" | cut -f-5; cat _scratch/FILL/* | fgrep -v "#" | sort  | cut -f-5 | uniq | sort -k2,2n | sortByRef.pl - /ifs/depot/assemblies/H.sapiens/hg19/hg19.fasta.fai) >maf3.vcf
+
