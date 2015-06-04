@@ -1,4 +1,5 @@
 #!/bin/bash
+SDIR="$( cd "$( dirname "$0" )" && pwd )"
 GENOMEFAI=/common/data/assemblies/H.sapiens/hg19/hg19.fasta.fai
 
 TDIR=$(dirname $1)
@@ -13,7 +14,7 @@ echo "##fileformat=VCFv4.2"
 echo "#CHROM POS ID REF ALT" | tr ' ' '\t'
 cat $TDIR/FILL/*vcf \
     | fgrep -v "#" | cut -f-5 \
-    | sort -k2,2n | sortByRef.pl - $GENOMEFAI \
+    | sort -k2,2n | $SDIR/sortByRef.pl - $GENOMEFAI \
     | uniq
 
 
