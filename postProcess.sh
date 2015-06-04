@@ -38,11 +38,12 @@ echo PROJECT=$PROJECT
 # Get indels from Hapolotype caller
 #
 
-if [ ! -f "$TDIR/germline.maf2.vep" ]; then
-    echo $0 "Getting Germline MAF"
-    $SDIR/getGermlineMaf.sh ${PROJECT} $HAPLOTYPEVCF $TDIR &
-    GERMLINE_CPID=$!
-fi
+# Deactivate GERMLINE postProcessing for now
+#if [ ! -f "$TDIR/germline.maf2.vep" ]; then
+#    echo $0 "Getting Germline MAF"
+#    $SDIR/getGermlineMaf.sh ${PROJECT} $HAPLOTYPEVCF $TDIR &
+#    GERMLINE_CPID=$!
+#fi
 
 HAPMAF=${PROJECT}___qSomHC_InDels__TCGA_MAF.txt
 
@@ -137,9 +138,9 @@ $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/merge_maf3.vep \
     > ${PROJECT}___SOMATIC.vep.maf
 
-echo $0 "Waiting for GERMLINE "$GERMLINE_CPID
-wait $GERMLINE_CPID
-echo $0 "DONE"
+#echo $0 "Waiting for GERMLINE "$GERMLINE_CPID
+#wait $GERMLINE_CPID
+#echo $0 "DONE"
 echo $0 "Waiting for FILL "$FILLOUT_CPID
 wait $FILLOUT_CPID
 echo $0 "DONE"
