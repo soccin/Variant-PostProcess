@@ -3,6 +3,7 @@
 import sys
 import csv
 from itertools import izip
+from util import *
 
 def cvtChrom(x):
     if x.isdigit():
@@ -35,28 +36,6 @@ impact410=set()
 with open(impact410File) as fp:
     for line in fp:
         impact410.add(line.strip())
-
-def vcf2mafEvent(chrom,pos,ref,alt):
-    delta=len(ref)-len(alt)
-    refN=ref
-    altN=alt
-    if delta==0:
-        endPos=pos
-        startPos=pos
-    elif delta>0:
-        endPos=str(int(pos)+len(refN)-1)
-        startPos=str(int(pos)+1)
-        refN=refN[1:]
-        if len(altN)==1:
-            altN='-'
-        else:
-            altN=altN[1:]
-    else:
-        endPos=str(int(pos)+1)
-        startPos=pos
-        refN="-"
-        altN=altN[1:]
-    return (chrom,startPos,endPos,refN,altN)
 
 exacDb=dict()
 with open(exacFile) as fp:

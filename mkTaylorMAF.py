@@ -2,6 +2,7 @@
 
 import sys
 import csv
+from util import *
 
 def cvtChrom(x):
     if x.isdigit():
