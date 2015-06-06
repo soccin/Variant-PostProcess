@@ -2,6 +2,7 @@
 
 import sys
 import csv
+from itertools import izip
 from util import *
 
 def cvtChrom(x):
@@ -32,6 +33,24 @@ impact410=set()
 with open(impact410File) as fp:
     for line in fp:
         impact410.add(line.strip())
+
+exacDb=dict()
+with open(exacFile) as fp:
+    line=fp.readline()
+    while line.startswith("##"):
+        line=fp.readline()
+    header=line[1:].strip().split()
+    cin=csv.DictReader(fp,fieldnames=header,delimiter="\t")
+    for r in cin:
+        if r["INFO"]!=".":
+            info=dict()
+            parseInfo=[x.split("=") for x in r["INFO"].split(";")]
+            for ((key,val),cType) in izip(parseInfo,(int,int,float)):
+                info[key]=cType(val)
+
+            (chrom,start,end,ref,alt)=vcf2mafEvent(r["CHROM"],r["POS"],r["REF"],r["ALT"])
+
+            exacDb["chr%s:%s-%s" % (chrom,start,end)]=info
 
 events=dict()
 with open(origMAFFile) as fp:
@@ -74,9 +93,15 @@ with open(origMAFFile) as fp:
                 r["n_depth"]=str(int(r["n_alt_count"])+int(r["n_ref_count"]))
             r["n_var_freq"]=float(r["n_alt_count"])/float(r["n_depth"])
 
+        if pos in exacDb:
+            r["ExAC_AC"]=exacDb[pos]["AC"]
+            r["ExAC_AF"]=exacDb[pos]["AF"]
+            r["ExAC_AN"]=exacDb[pos]["AN"]
+
         events[label]=r
 
-outFields=cin.fieldnames+["POS","TAG","LABEL","TriNuc","IMPACT_410","t_var_freq","n_var_freq"]
+outFields=cin.fieldnames+["POS","TAG","LABEL","TriNuc","IMPACT_410","t_var_freq","n_var_freq",
+                            "ExAC_AC","ExAC_AF","ExAC_AN"]
 cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t")
 cout.writeheader()
 for ki in sorted(events):
