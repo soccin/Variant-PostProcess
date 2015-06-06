@@ -142,3 +142,6 @@ $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/maf3.
 echo $0 "Waiting for FILL "$FILLOUT_CPID
 wait $FILLOUT_CPID
 echo $0 "DONE"
+
+python2.7 $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
+
