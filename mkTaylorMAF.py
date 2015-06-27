@@ -91,7 +91,10 @@ with open(origMAFFile) as fp:
         else:
             if r["n_depth"]=="":
                 r["n_depth"]=str(int(r["n_alt_count"])+int(r["n_ref_count"]))
-            r["n_var_freq"]=float(r["n_alt_count"])/float(r["n_depth"])
+            if int(r["n_depth"])>0:
+                r["n_var_freq"]=float(r["n_alt_count"])/float(r["n_depth"])
+            else:
+                r["n_var_freq"]=0.0
 
         if pos in exacDb:
             r["ExAC_AC"]=exacDb[pos]["AC"]
