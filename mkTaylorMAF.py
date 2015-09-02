@@ -67,7 +67,9 @@ with open(origMAFFile) as fp:
             print >>sys.stderr, r
             print >>sys.stderr
             sys.exit()
-        chrom=r["Chromosome"][3:]
+        chrom=r["Chromosome"]
+        if chrom.startswith("chr"):
+            chrom=chrom[3:]
         pos=r["Chromosome"]+":"+r["Start_Position"]+"-"+r["End_Position"]
         tag=pos+":"+r["Reference_Allele"]+":"+alt
         label=tag+"::"+r["Tumor_Sample_Barcode"]+":"+r["Matched_Norm_Sample_Barcode"]
