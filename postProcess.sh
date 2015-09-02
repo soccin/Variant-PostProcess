@@ -3,7 +3,7 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 VARIANTSPIPEDIR=/home/socci/Code/Pipelines/CBE/Variant/variants_pipeline
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
-VEPPATH=/opt/common/CentOS_6/vep/v79
+VEPPATH=/opt/common/CentOS_6/vep/v81
 GENOME=/common/data/assemblies/H.sapiens/hg19/hg19.fasta
 EXACDB=/ifs/work/socci/Depot/Pipelines/Variant/PostProcess/db/ExAC.r0.3.sites.pass.minus_somatic.vcf.gz
 
@@ -96,13 +96,18 @@ echo $0 "Done with Mutect"
 
 if [ ! -f "$TDIR/merge_maf3.vep" ]; then
 
+PERL=/opt/common/CentOS_6-dev/perl/perl-5.22.0/bin/perl
+VCF2MAF=/opt/common/CentOS_6/vcf2maf/v1.6.1
+MSK_ISOFORMS=/opt/common/CentOS_6-dev/vcf2maf/v1.6.1/data/isoform_overrides_at_mskcc
+
 mkdir -p $TDIR/SOM
-/opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2maf.pl \
+$PERL $VCF2MAF/maf2maf.pl \
     --vep-forks 12 \
     --tmp-dir $TDIR/SOM \
     --vep-path $VEPPATH \
 	--vep-data $VEPPATH \
 	--ref-fasta $TDIR/$(basename $GENOME) \
+    --custom-enst $MSK_ISOFORMS \
 	--retain-cols Center,Verification_Status,Validation_Status,Mutation_Status,Sequencing_Phase,Sequence_Source,Validation_Method,Score,BAM_file,Sequencer,Tumor_Sample_UUID,Matched_Norm_Sample_UUID,Caller \
 	--input-maf $TDIR/merge_maf3 \
 	--output-maf $TDIR/merge_maf3.vep
