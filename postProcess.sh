@@ -4,8 +4,8 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 VARIANTSPIPEDIR=/home/socci/Code/Pipelines/CBE/Variant/variants_pipeline
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 VEPPATH=/opt/common/CentOS_6/vep/v81
-GENOME=/common/data/assemblies/H.sapiens/hg19/hg19.fasta
-EXACDB=/ifs/work/socci/Depot/Pipelines/Variant/PostProcess/db/ExAC.r0.3.sites.pass.minus_somatic.vcf.gz
+
+source $SDIR/genomeInfo.sh
 
 if [ $# -ne 2 ]; then
 	echo "usage: postProcess.sh PairingFile PipelineOutputDir"
@@ -107,10 +107,11 @@ $PERL $VCF2MAF/maf2maf.pl \
     --vep-path $VEPPATH \
 	--vep-data $VEPPATH \
 	--ref-fasta $TDIR/$(basename $GENOME) \
-    --custom-enst $MSK_ISOFORMS \
 	--retain-cols Center,Verification_Status,Validation_Status,Mutation_Status,Sequencing_Phase,Sequence_Source,Validation_Method,Score,BAM_file,Sequencer,Tumor_Sample_UUID,Matched_Norm_Sample_UUID,Caller \
+    --custom-enst $MSK_ISOFORMS \
 	--input-maf $TDIR/merge_maf3 \
 	--output-maf $TDIR/merge_maf3.vep
+
 
 $SDIR/maf2vcfSimple.sh $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
 cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf
