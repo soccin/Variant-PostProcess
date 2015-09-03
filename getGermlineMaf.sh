@@ -3,8 +3,9 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
 VEPPATH=/opt/common/CentOS_6/vep/v79
-GENOME=/ifs/depot/assemblies/H.sapiens/hg19/hg19.fasta
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
+
+source $SDIR/genomeInfo.sh
 
 PROJECT=$1
 VCF=$2
