@@ -4,15 +4,16 @@
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
-if [ $# -ne 2 ]; then
-	echo "usage: postProcess.sh ProjectDir PipelineOutputDir"
+if [ $# -ne 1 ]; then
+	echo "usage: postProcess.sh PipelineOutputDir"
 	exit
 fi
 
-PROJECTDIR=$1
-PIPELINEDIR=$2
+PIPELINEDIR=$1
 
-projectNo=$(echo $PROJECTDIR | perl -ne 'm|/Proj_([^/\s]*)|; print $1')
+projectNo=$(echo $PIPELINEDIR | perl -ne 'm|/Proj_([^/\s]*)|; print $1')
+
+PROJECTDIR=$(ls -d /ifs/projects/BIC/* | fgrep $projectNo)
 
 echo $PROJECTDIR
 echo $PIPELINEDIR
