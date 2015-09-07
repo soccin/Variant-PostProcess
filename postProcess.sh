@@ -1,10 +1,8 @@
 #!/bin/bash
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
-VARIANTSPIPEDIR=/home/socci/Code/Pipelines/CBE/Variant/variants_pipeline
-BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
-VEPPATH=/opt/common/CentOS_6/vep/v81
 
+source $SDIR/paths.sh
 source $SDIR/genomeInfo.sh
 
 if [ $# -ne 2 ]; then
@@ -95,10 +93,6 @@ fi
 echo $0 "Done with Mutect"
 
 if [ ! -f "$TDIR/merge_maf3.vep" ]; then
-
-PERL=/opt/common/CentOS_6-dev/perl/perl-5.22.0/bin/perl
-VCF2MAF=/opt/common/CentOS_6/vcf2maf/v1.6.1
-MSK_ISOFORMS=/opt/common/CentOS_6-dev/vcf2maf/v1.6.1/data/isoform_overrides_at_mskcc
 
 mkdir -p $TDIR/SOM
 $PERL $VCF2MAF/maf2maf.pl \
