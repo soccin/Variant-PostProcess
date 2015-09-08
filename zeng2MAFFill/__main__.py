@@ -55,15 +55,27 @@ def vcf2mafEvent(chrom,pos,ref,alt):
         endPos=pos
         startPos=pos
     elif delta>0:
+        # Deletion
         endPos=str(int(pos)+len(refN)-1)
-        startPos=str(int(pos)+len(refN)-delta)
-        refN=refN[(len(refN)-delta):]
-        altN='-'
+        startPos=str(int(pos)+1)
+
+        refN=refN[1:]
+        if len(altN)==1:
+            altN="-"
+        else:
+            altN=altN[1:]
+
     else:
+        # Insertion
         endPos=str(int(pos)+1)
         startPos=pos
-        refN="-"
-        altN=altN[len(ref):]
+
+        altN=altN[1:]
+        if len(refN)==1:
+            refN="-"
+        else:
+            refN=refN[1:]
+
     return (chrom,startPos,endPos,refN,altN)
 
 for rec in cin:
