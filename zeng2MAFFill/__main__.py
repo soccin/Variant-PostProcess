@@ -30,6 +30,8 @@ with open(MAFFILE) as fp:
         mafSamples[key].add(r["Matched_Norm_Sample_Barcode"])
 
 output=sys.stdout
+import annotateMAF
+annotateMAF.printAnnotation(sys.stdout)
 output.write(VEP_MAF_Ext.header()+"\n")
 
 sampleDb=set()

@@ -54,7 +54,7 @@ with open(exacFile) as fp:
 
 events=dict()
 with open(origMAFFile) as fp:
-    print fp.readline(),
+    commentHeader=fp.readline().strip()
     cin=csv.DictReader(fp,delimiter="\t")
     for r  in cin:
         if r["Reference_Allele"]!=r["Tumor_Seq_Allele1"]:
@@ -108,6 +108,12 @@ with open(origMAFFile) as fp:
 outFields=cin.fieldnames+["POS","TAG","LABEL","TriNuc","IMPACT_410","t_var_freq","n_var_freq",
                             "ExAC_AC","ExAC_AF","ExAC_AN"]
 cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t")
+
+print commentHeader
+
+import annotateMAF
+annotateMAF.printAnnotation()
+
 cout.writeheader()
 for ki in sorted(events):
     cout.writerow(events[ki])
