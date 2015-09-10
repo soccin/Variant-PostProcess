@@ -13,6 +13,8 @@ fi
 PAIRING=$1
 PIPEOUT=$2
 PIPEOUT=$(echo $PIPEOUT | sed 's/\/$//')
+PROJECT=$(echo $PIPEOUT | perl -ne 'm|/Proj_([^/\s]*)|; print $1')
+echo PROJECT=$PROJECT
 
 TDIR=_scratch
 mkdir -p $TDIR
@@ -29,8 +31,6 @@ if [ ! -f "$HAPLOTYPEVCF" ]; then
     exit
 fi
 
-PROJECT=$(basename $HAPLOTYPEVCF | sed 's/_HaplotypeCaller.vcf//')
-echo PROJECT=$PROJECT
 
 #
 # Get indels from Hapolotype caller
