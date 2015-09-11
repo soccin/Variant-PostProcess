@@ -2,12 +2,8 @@
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
-VARIANTSPIPEDIR=/home/socci/Code/Pipelines/CBE/Variant/variants_pipeline
-#BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
-GENOME=/ifs/depot/assemblies/H.sapiens/hg19/hg19.fasta
-
-# Merge the Haplotype (for indels) and mutect outputs from the
-# BIC/CBE pipeline
+source $SDIR/paths.sh
+source $SDIR/genomeInfo.sh
 
 if [ $# -ne 2 ]; then
 	echo "usage: postProcess.sh PairingFile PipelineOutputDir"
@@ -17,6 +13,8 @@ fi
 PAIRING=$1
 PIPEOUT=$2
 PIPEOUT=$(echo $PIPEOUT | sed 's/\/$//')
+PROJECT=$(echo $PIPEOUT | perl -ne 'm|/(Proj_[^/\s]*)|; print $1')
+echo PROJECT=$PROJECT
 
 TDIR=_scratch
 mkdir -p $TDIR
@@ -33,17 +31,22 @@ if [ ! -f "$HAPLOTYPEVCF" ]; then
     exit
 fi
 
-PROJECT=$(basename $HAPLOTYPEVCF | sed 's/_HaplotypeCaller.vcf//')
-echo PROJECT=$PROJECT
 
 #
 # Get indels from Hapolotype caller
 #
 
+# Deactivate GERMLINE postProcessing for now
+#if [ ! -f "$TDIR/germline.maf2.vep" ]; then
+#    echo $0 "Getting Germline MAF"
+#    $SDIR/getGermlineMaf.sh ${PROJECT} $HAPLOTYPEVCF $TDIR &
+#    GERMLINE_CPID=$!
+#fi
+
 HAPMAF=${PROJECT}___qSomHC_InDels__TCGA_MAF.txt
 
 if [ ! -f "$TDIR/$HAPMAF" ]; then
-    time $SDIR/vcf2maf0.py -c haplotypecaller -p $PAIRING -i $HAPLOTYPEVCF \
+    $SDIR/vcf2maf0.py -c haplotypecaller -p $PAIRING -i $HAPLOTYPEVCF \
         -o $TDIR/hap_maf0
     $SDIR/pA_qSomHC.py <$TDIR/hap_maf0 >$TDIR/hap_maf1
     $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/hap_maf1 $TDIR/hap_maf2
@@ -51,8 +54,6 @@ if [ ! -f "$TDIR/$HAPMAF" ]; then
 fi
 
 echo $0 "Done with haplotype processing ..."
-exit
-
 
 #
 # Get DMP re-filtered MAF from mutect
@@ -94,15 +95,17 @@ echo $0 "Done with Mutect"
 if [ ! -f "$TDIR/merge_maf3.vep" ]; then
 
 mkdir -p $TDIR/SOM
-/opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2maf.pl \
+$PERL $VCF2MAF/maf2maf.pl \
     --vep-forks 12 \
     --tmp-dir $TDIR/SOM \
     --vep-path $VEPPATH \
 	--vep-data $VEPPATH \
 	--ref-fasta $TDIR/$(basename $GENOME) \
 	--retain-cols Center,Verification_Status,Validation_Status,Mutation_Status,Sequencing_Phase,Sequence_Source,Validation_Method,Score,BAM_file,Sequencer,Tumor_Sample_UUID,Matched_Norm_Sample_UUID,Caller \
+    --custom-enst $MSK_ISOFORMS \
 	--input-maf $TDIR/merge_maf3 \
 	--output-maf $TDIR/merge_maf3.vep
+
 
 $SDIR/maf2vcfSimple.sh $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
 cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf

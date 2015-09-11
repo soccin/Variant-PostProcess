@@ -1,13 +1,15 @@
 #!/bin/bash
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
-GENOMEFAI=/common/data/assemblies/H.sapiens/hg19/hg19.fasta.fai
+
+source $SDIR/genomeInfo.sh
+source $SDIR/paths.sh
 
 TDIR=$(dirname $1)
 mkdir $TDIR/FILL
 
-/opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2vcf.pl \
+$PERL $VCF2MAF/maf2vcf.pl \
     --input-maf $1 \
-    --ref-fasta $TDIR/hg19.fasta \
+    --ref-fasta $TDIR/$(basename $GENOME) \
     --output-dir $TDIR/FILL
 
 echo "##fileformat=VCFv4.2"
