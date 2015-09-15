@@ -115,7 +115,7 @@ $SDIR/tabix -p vcf $TDIR/maf3.vcf.gz
     annotate --annotations $EXACDB \
     --columns AC,AN,AF --output-type v --output $TDIR/maf3.exac.vcf $TDIR/maf3.vcf.gz
 
-/home/socci/Code/Pipelines/Post/MAFFillOut/fillOutMAF_CBE.sh \
+$SDIR/fillOutMAF_CBE.sh \
     $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
 FILLOUT_CPID=$!
 fi
