@@ -41,12 +41,28 @@ parser.add_argument("maf0", help="Old maf file")
 parser.add_argument("maf1", help="New maf file")
 args=parser.parse_args()
 
+def stripCommentsFromStream(input,output):
+  '''stripCommentsFromStream
+  Given an input file object remove any comment
+  header lines (lines starting with "#") and
+  write these lines verbatum to the output.
+  Then pass back the remaining input lines
+  '''
+
+  line=input.next()
+  while line.startswith("#"):
+    print >>output, line,
+    line=input.next()
+  yield line # First non-comment line
+  for line in input:
+    yield line
+
 with open(args.maf0, 'rb') as input:
-  cin=csv.DictReader(input,delimiter="\t")
   if args.maf1=="-":
     output=sys.stdout
   else:
     output=open(args.maf1,'w')
+  cin=csv.DictReader(stripCommentsFromStream(input,output),delimiter="\t")
   cout=csv.DictWriter(output,cin.fieldnames,delimiter="\t")
   cout.writeheader()
   for r in cin:
