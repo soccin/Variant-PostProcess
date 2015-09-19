@@ -85,6 +85,10 @@ for rec in cin:
     (chrom,startPos,endPos,ref,alt)=vcf2mafEvent(r.Chrom,r.Pos,r.Ref,r.Alt)
     key=(chrom,startPos,endPos,ref,alt)
 
+    if key not in mafEvents:
+        print >>sys.stderr, "Fill Key =", key
+        continue
+        #sys.exit(1)
     s1=mafEvents[key].keys()[0]
     rec1=mafEvents[key][s1]
 
