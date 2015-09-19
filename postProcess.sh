@@ -50,7 +50,8 @@ if [ ! -f "$TDIR/$HAPMAF" ]; then
         -o $TDIR/hap_maf0
     $SDIR/pA_qSomHC.py <$TDIR/hap_maf0 >$TDIR/hap_maf1
     $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/hap_maf1 $TDIR/hap_maf2
-    $SDIR/indelOnly.py <$TDIR/hap_maf2 >$TDIR/$HAPMAF
+    $SDIR/indelOnly.py <$TDIR/hap_maf2 >$TDIR/hap_maf2b
+    $SDIR/normalizeInDels.py $TDIR/hap_maf2b $TDIR/$HAPMAF
 fi
 
 echo $0 "Done with haplotype processing ..."
