@@ -9,6 +9,7 @@ OUT=$3
 INPUTS=$(ls $BAMDIR/*bam | perl -ne 'chomp; m|_(s_.*).bam|;print "--bam ",$1,":",$_,"\n"')
 
 /home/socci/Code/Zeng/GetBaseCountsMultiSample/GetBaseCountsMultiSample \
+    --thread 12 \
 	--filter_improper_pair 0 --fasta $GENOME \
 	--vcf $VCF \
 	--output $OUT \
