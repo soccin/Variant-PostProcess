@@ -13,12 +13,13 @@ PIPELINEDIR=$1
 
 projectNo=$(echo $PIPELINEDIR | perl -ne 'm|/Proj_([^/\s]*)|; print $1')
 
-PROJECTDIR=$(ls -d /ifs/projects/BIC/* | fgrep $projectNo)
+PROJECTDIR=$(find /ifs/projects/BIC -type d | egrep "Proj_$projectNo$")
 
-echo $PROJECTDIR
-echo $PIPELINEDIR
-echo $PROJECTDIR/*_sample_pairing.txt
-echo $projectNo
+echo PROJECTDIR=$PROJECTDIR
+echo PIPELINEDIR=$PIPELINEDIR
+echo pairingFile=$PROJECTDIR/*_sample_pairing.txt
+echo projectNo=$projectNo
+
 
 bsub -J POST_$projectNo -n 24 -R "rusage[mem=64]" -o LSF.POST/ \
     ~/Code/Pipelines/CBE/Variant/PostProcessV1/postProcess.sh \
