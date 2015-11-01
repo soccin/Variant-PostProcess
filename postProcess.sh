@@ -66,8 +66,9 @@ echo $0 $MUTECTDIR
 if [ ! -f "$TDIR/merge_maf3" ]; then
     for vcf in $MUTECTDIR/*vcf; do
         BASE=$(basename $vcf | sed 's/.vcf//')
-        normal=$(echo $vcf | perl -ne '/_(s_.*?)_(s_.*?)_mutect/; print "$1"')
-        tumor=$(echo $vcf | perl -ne '/_(s_.*?)_(s_.*?)_mutect/; print "$2"')
+		PAIR=$($SDIR/getMutectPair.py $PAIRING $vcf)
+		normal=$(echo $PAIR | perl -ne '/normal:=(\S+) tumor:=(\S+)$/; print $1')
+		tumor=$(echo $PAIR | perl -ne '/normal:=(\S+) tumor:=(\S+)$/; print $2')
         echo $vcf, $normal, $tumor
         $SDIR/vcf2maf0.py -c mutect -p $PAIRING \
             -t $tumor -n $normal -i $vcf \

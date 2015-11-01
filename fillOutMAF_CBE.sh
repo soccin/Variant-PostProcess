@@ -6,7 +6,8 @@ BAMDIR=$(echo $BAMDIR | sed 's/\/$//')
 VCF=$2
 OUT=$3
 
-INPUTS=$(ls $BAMDIR/*bam | perl -ne 'chomp; m|_(s_.*).bam|;print "--bam ",$1,":",$_,"\n"')
+INPUTS=$(ls $BAMDIR/*bam \
+	| perl -ne 'chomp; m|_indelRealigned_recal_(\S+).bam|;print "--bam ",$1,":",$_,"\n"')
 
 /home/socci/Code/Zeng/GetBaseCountsMultiSample/GetBaseCountsMultiSample \
     --thread 12 \
