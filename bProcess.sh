@@ -13,7 +13,7 @@ PIPELINEDIR=$1
 
 projectNo=$(echo $PIPELINEDIR | perl -ne 'm|/Proj_([^/\s]*)|; print $1')
 
-PROJECTDIR=$(find /ifs/projects/BIC -type d | egrep "Proj_$projectNo$")
+PROJECTDIR=$(find /ifs/projects/BIC -type d | fgrep -v drafts | egrep "Proj_$projectNo$")
 
 echo PROJECTDIR=$PROJECTDIR
 echo PIPELINEDIR=$PIPELINEDIR
