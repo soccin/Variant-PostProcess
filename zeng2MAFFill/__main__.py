@@ -115,6 +115,7 @@ for rec in cin:
             sampleDat=dict([x.split("=") for x in rec[si].split(";")])
             mafS.t_ref_count=sampleDat["RD"]
             mafS.t_alt_count=sampleDat["AD"]
+            mafS.t_depth=sampleDat["DP"]
         mafS.Chromosome=mafS.Chromosome[3:]
         output.write(str(mafS)+"\n")
 
