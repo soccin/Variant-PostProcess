@@ -8,12 +8,20 @@ BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 source $SDIR/genomeInfo.sh
 source $SDIR/paths.sh
 
+if [ "$#" != "3" ]; then
+    echo "usage: $(basename $0) PROJECT_NO HAPLOTYPE_VCF TMPDIR"
+    exit
+fi
+
 PROJECT=$1
 VCF=$2
 TDIR=$3
 
+mkdir -p $TDIR
+
 if [ ! -f "$TDIR/$(basename $GENOME)" ]; then
 	ln -s $GENOME $TDIR/$(basename $GENOME)
+    ln -s ${GENOME}.fai $TDIR/$(basename $GENOME).fai
 fi
 
 if [ ! -f "$TDIR/germline.maf0" ]; then
@@ -23,7 +31,10 @@ fi
 echo $0 "MAF0 ready"
 
 $SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
+echo $0 "MAF1 ready"
 $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/germline.maf1 $TDIR/germline.maf2
+echo $0 "MAF2 ready"
+
 
 if [ ! -f "$TDIR/germline.maf2.vep" ]; then
 $PERL $VCF2MAF/maf2maf.pl \
@@ -55,9 +66,21 @@ $BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
 
 echo $0 "Making final MAF"
 
-$SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline.maf2.vep \
+echo $0 "computing ExAC"
+
+$SDIR/maf2vcfSimple.sh $TDIR/germline.maf2 >$TDIR/germline_maf2.vcf
+cat $TDIR/germline_maf2.vcf | sed 's/^chr//' > $TDIR/germline_maf3.vcf
+$SDIR/bgzip $TDIR/germline_maf3.vcf
+$SDIR/tabix -p vcf $TDIR/germline_maf3.vcf.gz
+/opt/common/CentOS_6/bcftools/bcftools-1.2/bin/bcftools \
+     annotate --annotations $EXACDB \
+     --columns AC,AN,AF --output-type v --output $TDIR/germline_maf3.exac.vcf $TDIR/germline_maf3.vcf.gz
+
+
+echo $0 "Computing CMO MAF"
+
+$SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline_maf3.exac.vcf $TDIR/germline.maf2.vep \
     > ${PROJECT}___GERMLINE.vep.maf
 
-$SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/maf3.exac.vcf $TDIR/merge_maf3.vep \
-    > ${PROJECT}___SOMATIC.vep.maf
+echo $0 "DONE"
 
