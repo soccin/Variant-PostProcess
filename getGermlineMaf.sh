@@ -6,6 +6,7 @@ VEPPATH=/opt/common/CentOS_6/vep/v79
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 
 source $SDIR/genomeInfo.sh
+source $SDIR/paths.sh
 
 PROJECT=$1
 VCF=$2
@@ -25,14 +26,14 @@ $SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
 $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/germline.maf1 $TDIR/germline.maf2
 
 if [ ! -f "$TDIR/germline.maf2.vep" ]; then
-    mkdir -p $TDIR/GERM
-    /opt/common/CentOS_6/bin/v1/perl /opt/common/CentOS_6/vcf2maf/v1.5.2/maf2maf.pl \
+$PERL $VCF2MAF/maf2maf.pl \
     --vep-forks 12 \
     --tmp-dir $TDIR/GERM \
     --vep-path $VEPPATH \
     --vep-data $VEPPATH \
     --ref-fasta $TDIR/$(basename $GENOME) \
     --retain-cols Center,Verification_Status,Validation_Status,Mutation_Status,Sequencing_Phase,Sequence_Source,Validation_Method,Score,BAM_file,Sequencer,Tumor_Sample_UUID,Matched_Norm_Sample_UUID,Caller \
+    --custom-enst $MSK_ISOFORMS \
     --input-maf $TDIR/germline.maf2 \
     --output-maf $TDIR/germline.maf2.vep
 fi
@@ -56,4 +57,7 @@ echo $0 "Making final MAF"
 
 $SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline.maf2.vep \
     > ${PROJECT}___GERMLINE.vep.maf
+
+$SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/maf3.exac.vcf $TDIR/merge_maf3.vep \
+    > ${PROJECT}___SOMATIC.vep.maf
 
