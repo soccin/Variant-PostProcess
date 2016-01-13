@@ -31,17 +31,21 @@ if [ ! -f "$HAPLOTYPEVCF" ]; then
     exit
 fi
 
+# Germline calls
+
+if [ ! -f "$TDIR/germline_maf3.exac.vcf" ]; then
+    bsub -o LSF/ -J GERM_${PROJECT} \
+      -n 12 -We 59 -R "rusage[mem=32]" \
+      $SDIR/getGermlineMaf.sh ${PROJECT} \
+      $HAPLOTYPEVCF \
+      $TDIR
+fi
+
 
 #
 # Get indels from Hapolotype caller
 #
 
-# Deactivate GERMLINE postProcessing for now
-#if [ ! -f "$TDIR/germline.maf2.vep" ]; then
-#    echo $0 "Getting Germline MAF"
-#    $SDIR/getGermlineMaf.sh ${PROJECT} $HAPLOTYPEVCF $TDIR &
-#    GERMLINE_CPID=$!
-#fi
 
 HAPMAF=${PROJECT}___qSomHC_InDels__TCGA_MAF.txt
 
