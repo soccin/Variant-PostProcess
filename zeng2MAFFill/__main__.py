@@ -17,9 +17,15 @@ FILLFILE=sys.argv[2]
 mafEvents=defaultdict(dict)
 mafSamples=defaultdict(set)
 with open(MAFFILE) as fp:
-    VERSIONTAG=fp.readline()
-    print VERSIONTAG,
-    cin=csv.DictReader(fp,delimiter="\t")
+    # Get multi line headers
+    header=fp.readline()
+    while header.startswith("#"):
+        print header,
+        header=fp.readline()
+
+    columns=header.strip().split("\t")
+
+    cin=csv.DictReader(fp,fieldnames=columns,delimiter="\t")
     MAFHEADER=cin.fieldnames
     for r in cin:
         key=(r["Chromosome"],r["Start_Position"],r["End_Position"],
