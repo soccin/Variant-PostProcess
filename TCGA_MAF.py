@@ -22,7 +22,7 @@ class TCGA_MAF(object):
         for fi in TCGA_MAF.fields:
             self.__dict__[fi]=""
         self.Center="bic.mskcc.org"
-        self.NCBI_Build="hg19"
+        self.NCBI_Build="b37"
         for ki in kw:
             self.__dict__[ki]=kw[ki]
     def __str__(self):

@@ -2,19 +2,33 @@
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
-source $SDIR/paths.sh
-source $SDIR/genomeInfo.sh
-
 if [ $# -ne 2 ]; then
 	echo "usage: postProcess.sh PairingFile PipelineOutputDir"
 	exit
 fi
+
+source $SDIR/paths.sh
 
 PAIRING=$1
 PIPEOUT=$2
 PIPEOUT=$(echo $PIPEOUT | sed 's/\/$//')
 PROJECT=$(echo $PIPEOUT | perl -ne 'm|/(Proj_[^/\s]*)|; print $1')
 echo PROJECT=$PROJECT
+
+BAM1=$(ls $PIPEOUT/alignments/*bam | head -1)
+GENOME_BUILD=$($SDIR/getGenomeBuild.sh $BAM1)
+echo BUILD=${GENOME_BUILD}
+
+GENOME_SH=$SDIR/genomeInfo_${GENOME_BUILD}.sh
+if [ ! -e "$GENOME_SH" ]; then
+    echo "Unknown genome build ["${GENOME_BUILD}"]"
+    exit
+fi
+
+echo "Loading genome [${GENOME_BUILD}]" $GENOME_SH
+source $GENOME_SH
+echo GENOME=$GENOME
+exit
 
 TDIR=_scratch
 mkdir -p $TDIR
@@ -53,7 +67,7 @@ if [ ! -f "$TDIR/$HAPMAF" ]; then
     $SDIR/vcf2maf0.py -c haplotypecaller -p $PAIRING -i $HAPLOTYPEVCF \
         -o $TDIR/hap_maf0
     $SDIR/pA_qSomHC.py <$TDIR/hap_maf0 >$TDIR/hap_maf1
-    $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/hap_maf1 $TDIR/hap_maf2
+    $SDIR/oldMAF2tcgaMAF.py ${GENOME_BUILD} $TDIR/hap_maf1 $TDIR/hap_maf2
     $SDIR/indelOnly.py <$TDIR/hap_maf2 >$TDIR/hap_maf2b
     $SDIR/normalizeInDels.py $TDIR/hap_maf2b $TDIR/$HAPMAF
 fi
@@ -78,7 +92,7 @@ if [ ! -f "$TDIR/merge_maf3" ]; then
             -t $tumor -n $normal -i $vcf \
             -o $TDIR/mt_maf0
         $SDIR/DMP_rescue.py  <$TDIR/mt_maf0 >$TDIR/mt_maf1
-        $SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/mt_maf1 $TDIR/mt_maf2
+        $SDIR/oldMAF2tcgaMAF.py ${GENOME_BUILD} $TDIR/mt_maf1 $TDIR/mt_maf2
         awk -F"\t" '$40=="FILTER"||$40=="PASS"{print $0}' $TDIR/mt_maf2 \
             >$TDIR/${BASE}___DMPFilter_TCGA_MAF.txt
     done
@@ -131,12 +145,12 @@ cat $TDIR/merge_maf3.vep \
     | awk '{print $5,$6-1,$7}' \
     | tr ' ' '\t'  >$TDIR/merge_maf3.bed
 
-$BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/merge_maf3.bed \
+$BEDTOOLS slop -g $SDIR/db/human.${GENOME_BUILD}.genome -b 1 -i $TDIR/merge_maf3.bed \
     | $BEDTOOLS getfasta -tab \
     -fi $GENOME -fo $TDIR/merge_maf3.seq -bed -
 
 $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
-    -b $SDIR/db/IMPACT_410_hg19_targets_plus3bp.bed -wa \
+    -b $SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/merge_maf3.impact410
 
 $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TDIR/maf3.exac.vcf $TDIR/merge_maf3.vep \

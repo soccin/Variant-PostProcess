@@ -5,7 +5,6 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 VEPPATH=/opt/common/CentOS_6/vep/v79
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 
-source $SDIR/genomeInfo.sh
 source $SDIR/paths.sh
 
 if [ "$#" != "3" ]; then
@@ -16,6 +15,17 @@ fi
 PROJECT=$1
 VCF=$2
 TDIR=$3
+
+GENOME_BUILD=$(head -100 $VCF | fgrep "##contig=" | fgrep assembly= | head -1 | perl -ne 'm/assembly=(.*)>/; print $1')
+echo GENOME_BUILD=$GENOME_BUILD
+GENOME_SH=$SDIR/genomeInfo_${GENOME_BUILD}.sh
+if [ ! -e "$GENOME_SH" ]; then
+    echo "Unknown genome build ["${GENOME_BUILD}"]"
+    exit
+fi
+echo "Loading genome [${GENOME_BUILD}]" $GENOME_SH
+source $GENOME_SH
+echo GENOME=$GENOME
 
 mkdir -p $TDIR
 
@@ -32,7 +42,7 @@ echo $0 "MAF0 ready"
 
 $SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
 echo $0 "MAF1 ready"
-$SDIR/oldMAF2tcgaMAF.py hg19 $TDIR/germline.maf1 $TDIR/germline.maf2
+$SDIR/oldMAF2tcgaMAF.py $GENOME_BUILD $TDIR/germline.maf1 $TDIR/germline.maf2
 echo $0 "MAF2 ready"
 
 
@@ -56,12 +66,12 @@ cat $TDIR/germline.maf2.vep \
     | awk '{print $5,$6-1,$7}' \
     | tr ' ' '\t'  >$TDIR/germline.maf2.bed
 
-$BEDTOOLS slop -g ~/lib/bedtools/genomes/human.hg19.genome -b 1 -i $TDIR/germline.maf2.bed \
+$BEDTOOLS slop -g $SDIR/db/human.${GENOME_BUILD}.genome -b 1 -i $TDIR/germline.maf2.bed \
     | $BEDTOOLS getfasta -tab \
     -fi $GENOME -fo $TDIR/germline.maf2.seq -bed -
 
 $BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
-    -b $SDIR/db/IMPACT_410_hg19_targets_plus3bp.bed -wa \
+    -b $SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed -wa \
     | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/germline.maf2.impact410
 
 echo $0 "Making final MAF"
