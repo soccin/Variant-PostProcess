@@ -28,7 +28,6 @@ fi
 echo "Loading genome [${GENOME_BUILD}]" $GENOME_SH
 source $GENOME_SH
 echo GENOME=$GENOME
-exit
 
 TDIR=_scratch
 mkdir -p $TDIR
