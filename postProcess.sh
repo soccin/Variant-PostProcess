@@ -126,7 +126,7 @@ $PERL $VCF2MAF/maf2maf.pl \
 	--output-maf $TDIR/merge_maf3.vep
 
 
-$SDIR/maf2vcfSimple.sh $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
+$SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
 cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf
 $SDIR/bgzip $TDIR/maf3.vcf
 $SDIR/tabix -p vcf $TDIR/maf3.vcf.gz

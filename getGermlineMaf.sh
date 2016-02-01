@@ -78,7 +78,7 @@ echo $0 "Making final MAF"
 
 echo $0 "computing ExAC"
 
-$SDIR/maf2vcfSimple.sh $TDIR/germline.maf2 >$TDIR/germline_maf2.vcf
+$SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/germline.maf2 >$TDIR/germline_maf2.vcf
 cat $TDIR/germline_maf2.vcf | sed 's/^chr//' > $TDIR/germline_maf3.vcf
 $SDIR/bgzip $TDIR/germline_maf3.vcf
 $SDIR/tabix -p vcf $TDIR/germline_maf3.vcf.gz
