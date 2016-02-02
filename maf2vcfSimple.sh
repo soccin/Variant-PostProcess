@@ -5,15 +5,15 @@ source $SDIR/paths.sh
 
 GENOME_BUILD=$1
 shift
-echo BUILD=${GENOME_BUILD}
+echo BUILD=${GENOME_BUILD} 1>&2
 GENOME_SH=$SDIR/genomeInfo_${GENOME_BUILD}.sh
 if [ ! -e "$GENOME_SH" ]; then
-    echo "Unknown genome build ["${GENOME_BUILD}"]"
+    echo "Unknown genome build ["${GENOME_BUILD}"]" 1>&2
     exit
 fi
-echo "Loading genome [${GENOME_BUILD}]" $GENOME_SH
+echo "Loading genome [${GENOME_BUILD}]" $GENOME_SH 1>&2
 source $GENOME_SH
-echo GENOME=$GENOME
+echo GENOME=$GENOME 1>&2
 
 TDIR=$(dirname $1)
 mkdir $TDIR/FILL
