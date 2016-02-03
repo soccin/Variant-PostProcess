@@ -35,7 +35,6 @@ echo $SCRIPT PROJECTDIR=\"$PROJECTDIR\"
 echo PIPELINEDIR=$PIPELINEDIR
 echo pairingFile=$PROJECTDIR/*_sample_pairing.txt
 echo projectNo=$projectNo
-exit
 
 
 bsub -o LSF.POST/ -J POST_$projectNo -n 12 -We 59 -R "rusage[mem=64]" \
