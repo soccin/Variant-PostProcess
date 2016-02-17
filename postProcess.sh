@@ -35,13 +35,23 @@ mkdir -p $TDIR
 ln -s $GENOME $TDIR/$(basename $GENOME)
 
 HAPLOTYPEVCF=$(ls $PIPEOUT/variants/haplotypecaller/*_HaplotypeCaller.vcf)
-
+LAYOUT=1
 if [ ! -f "$HAPLOTYPEVCF" ]; then
-    echo
-    echo FATAL ERROR Can not find Haplotype file in directory
-    echo $PIPEOUT/variants/haplotypecaller
-    echo
-    exit
+
+    # New format output directories
+    HAPLOTYPEVCF=$(ls $PIPEOUT/variants/snpsIndels/haplotypecaller/*_HaplotypeCaller.vcf)
+    LAYOUT=2
+
+    if [ -f "$HAPLOTYPEVCF" ]; then
+
+        echo
+        echo FATAL ERROR Can not find Haplotype file in directory
+        echo $PIPEOUT/variants/haplotypecaller
+        echo
+        exit -1
+
+    fi
+
 fi
 
 # Germline calls
@@ -77,7 +87,12 @@ echo $0 "Done with haplotype processing ..."
 # Get DMP re-filtered MAF from mutect
 #
 
-MUTECTDIR=$PIPEOUT/variants/mutect
+if [ "$LAYOUT" == "1" ]; then
+    MUTECTDIR=$PIPEOUT/variants/mutect
+else
+    MUTECTDIR=$PIPEOUT/variants/snpsIndels/mutect
+fi
+
 echo $0 $MUTECTDIR
 
 if [ ! -f "$TDIR/merge_maf3" ]; then
