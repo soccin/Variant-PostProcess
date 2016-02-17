@@ -42,7 +42,7 @@ if [ ! -f "$HAPLOTYPEVCF" ]; then
     HAPLOTYPEVCF=$(ls $PIPEOUT/variants/snpsIndels/haplotypecaller/*_HaplotypeCaller.vcf)
     LAYOUT=2
 
-    if [ -f "$HAPLOTYPEVCF" ]; then
+    if [ ! -f "$HAPLOTYPEVCF" ]; then
 
         echo
         echo FATAL ERROR Can not find Haplotype file in directory
