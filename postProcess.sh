@@ -29,30 +29,16 @@ echo "Loading genome [${GENOME_BUILD}]" $GENOME_SH
 source $GENOME_SH
 echo GENOME=$GENOME
 
+source $SDIR/funcs.sh
+
 TDIR=_scratch
 mkdir -p $TDIR
 
 ln -s $GENOME $TDIR/$(basename $GENOME)
 
-HAPLOTYPEVCF=$(ls $PIPEOUT/variants/haplotypecaller/*_HaplotypeCaller.vcf)
-LAYOUT=1
-if [ ! -f "$HAPLOTYPEVCF" ]; then
+HAPLOTYPEVCF=$(getHaplotypeVCF $PIPEOUT)
 
-    # New format output directories
-    HAPLOTYPEVCF=$(ls $PIPEOUT/variants/snpsIndels/haplotypecaller/*_HaplotypeCaller.vcf)
-    LAYOUT=2
-
-    if [ ! -f "$HAPLOTYPEVCF" ]; then
-
-        echo
-        echo FATAL ERROR Can not find Haplotype file in directory
-        echo $PIPEOUT/variants/haplotypecaller
-        echo
-        exit -1
-
-    fi
-
-fi
+echo HAPLOTYPEVCF=$HAPLOTYPEVCF
 
 # Germline calls
 
