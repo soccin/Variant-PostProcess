@@ -14,7 +14,7 @@ function getHaplotypeVCF {
 
     else
 
-        echo FATAL ERROR Unknow pipeline output directory format
+        echo FATAL ERROR Unknown pipeline output directory format
         exit -1
 
     fi
@@ -31,5 +31,21 @@ function getHaplotypeVCF {
     fi
 
     echo "$HAPLOTYPEVCF"
+
+}
+
+function getMutectDir {
+
+    PIPEOUT=$1
+    if [ -e $PIPEOUT/variants/mutect ]; then
+        MUTECTDIR=$PIPEOUT/variants/mutect
+    elif [ -e $PIPEOUT/variants/snpsIndels/mutect ]; then
+        MUTECTDIR=$PIPEOUT/variants/snpsIndels/mutect
+    else
+        echo FATAL ERROR Unknown pipeline output directory format
+        exit -1
+    fi
+
+    echo "$MUTECTDIR"
 
 }

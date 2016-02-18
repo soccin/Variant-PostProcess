@@ -73,11 +73,7 @@ echo $0 "Done with haplotype processing ..."
 # Get DMP re-filtered MAF from mutect
 #
 
-if [ "$LAYOUT" == "1" ]; then
-    MUTECTDIR=$PIPEOUT/variants/mutect
-else
-    MUTECTDIR=$PIPEOUT/variants/snpsIndels/mutect
-fi
+MUTECTDIR=$(getMutectDir $PIPEOUT)
 
 echo $0 $MUTECTDIR
 
