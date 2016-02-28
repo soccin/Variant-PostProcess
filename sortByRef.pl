@@ -70,9 +70,9 @@ if ($input_file eq "-" ) {
 my %temp_outputs;
 
 while ( <$INPUT> ) {
-    
+
     my @fields = split '\s';
-    die("Specified field position exceeds the number of fields:\n$_") 
+    die("Specified field position exceeds the number of fields:\n$_")
         if ( $pos >= scalar(@fields) );
 
     my $contig = $fields[$pos];
@@ -87,8 +87,8 @@ while ( <$INPUT> ) {
     if ( defined $ref_order{$contig} ) { $order = $ref_order{$contig}; }
     else {
         $ref_order{$contig} = $n;
-        $order = $n; # input line has contig that was not in the dict; 
-        $n++; # this contig will go at the end of the output, 
+        $order = $n; # input line has contig that was not in the dict;
+        $n++; # this contig will go at the end of the output,
               # after all known contigs
     }
 
@@ -101,7 +101,7 @@ while ( <$INPUT> ) {
         $temp_outputs{$order} = $fhandle;
     }
 
-    # we got the handle to the temp file that keeps all 
+    # we got the handle to the temp file that keeps all
     # lines with contig $contig
 
     print $fhandle $_; # send current line to its corresponding temp file
@@ -114,14 +114,14 @@ foreach my $f ( values %temp_outputs ) { close $f; }
 # now collect back into single output stream:
 
 for ( my $i = 0 ; $i < $n ; $i++ ) {
-    # if we did not have any lines on contig $i, then there's 
+    # if we did not have any lines on contig $i, then there's
     # no temp file and nothing to do
-    next if ( ! defined $temp_outputs{$i} ) ; 
+    next if ( ! defined $temp_outputs{$i} ) ;
 
-    my $f; 
+    my $f;
     open ( $f, "< $tmp/sortByRef.$$.$i.tmp" );
     while ( <$f> ) { print ; }
     close $f;
 
-    unlink "$tmp/sortByRef.$$.$i.tmp";    
+    unlink "$tmp/sortByRef.$$.$i.tmp";
 }
