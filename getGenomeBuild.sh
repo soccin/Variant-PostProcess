@@ -18,6 +18,11 @@ case $GENOME_MD5 in
     echo "hg19"
     ;;
 
+    d660fd17a979374182d3ba8b6d76cac0)
+    # UCSC mm10 /ifs/depot/assemblies/M.musculus/mm10/mm10.dict
+    echo "mm10"
+    ;;
+
     *)
     echo "unknown" $GENOME_MD5
     ;;
