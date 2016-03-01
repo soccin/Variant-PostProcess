@@ -7,17 +7,16 @@ BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
 
 source $SDIR/paths.sh
 
-if [ "$#" != "3" ]; then
-    echo "usage: $(basename $0) PROJECT_NO HAPLOTYPE_VCF TMPDIR"
+if [ "$#" != "4" ]; then
+    echo "usage: $(basename $0) GENOME_BUILD PROJECT_NO HAPLOTYPE_VCF TMPDIR"
     exit
 fi
 
-PROJECT=$1
-VCF=$2
-TDIR=$3
+GENOME_BUILD=$1
+PROJECT=$2
+VCF=$3
+TDIR=$4
 
-GENOME_BUILD=$(head -100 $VCF | fgrep "##contig=" | fgrep assembly= | head -1 | perl -ne 'm/assembly=(.*)>/; print $1')
-echo GENOME_BUILD=$GENOME_BUILD
 GENOME_SH=$SDIR/genomeInfo_${GENOME_BUILD}.sh
 if [ ! -e "$GENOME_SH" ]; then
     echo "Unknown genome build ["${GENOME_BUILD}"]"
@@ -66,26 +65,38 @@ cat $TDIR/germline.maf2.vep \
     | awk '{print $5,$6-1,$7}' \
     | tr ' ' '\t'  >$TDIR/germline.maf2.bed
 
-$BEDTOOLS slop -g $SDIR/db/human.${GENOME_BUILD}.genome -b 1 -i $TDIR/germline.maf2.bed \
+$BEDTOOLS slop -g $SDIR/db/${GENOME_BUILD}.genome -b 1 -i $TDIR/germline.maf2.bed \
     | $BEDTOOLS getfasta -tab \
     -fi $GENOME -fo $TDIR/germline.maf2.seq -bed -
 
-$BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
-    -b $SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed -wa \
-    | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/germline.maf2.impact410
-
+if [ -e "$SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed" ]; then
+    $BEDTOOLS intersect -a $TDIR/germline.maf2.bed \
+        -b $SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed -wa \
+        | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/germline.maf2.impact410
+else
+    echo
+    echo "No IMPACT BED for this GENOME"
+    echo
+    touch $TDIR/germline.maf2.impact410
+fi
 echo $0 "Making final MAF"
 
 echo $0 "computing ExAC"
 
-$SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/germline.maf2 >$TDIR/germline_maf2.vcf
-cat $TDIR/germline_maf2.vcf | sed 's/^chr//' > $TDIR/germline_maf3.vcf
-$SDIR/bgzip $TDIR/germline_maf3.vcf
-$SDIR/tabix -p vcf $TDIR/germline_maf3.vcf.gz
-/opt/common/CentOS_6/bcftools/bcftools-1.2/bin/bcftools \
-     annotate --annotations $EXACDB \
-     --columns AC,AN,AF --output-type v --output $TDIR/germline_maf3.exac.vcf $TDIR/germline_maf3.vcf.gz
-
+if [ "$EXACDB" != "" ]; then
+    $SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/germline.maf2 >$TDIR/germline_maf2.vcf
+    cat $TDIR/germline_maf2.vcf | sed 's/^chr//' > $TDIR/germline_maf3.vcf
+    $SDIR/bgzip $TDIR/germline_maf3.vcf
+    $SDIR/tabix -p vcf $TDIR/germline_maf3.vcf.gz
+     /opt/common/CentOS_6/bcftools/bcftools-1.2/bin/bcftools \
+         annotate --annotations $EXACDB \
+         --columns AC,AN,AF --output-type v --output $TDIR/germline_maf3.exac.vcf $TDIR/germline_maf3.vcf.gz
+else
+    echo
+    echo "No EXACDB for this GENOME" $GENOME_BUILD
+    echo
+    touch $TDIR/germline_maf3.vcf.gz
+fi
 
 echo $0 "Computing CMO MAF"
 

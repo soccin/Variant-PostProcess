@@ -50,7 +50,7 @@ echo HAPLOTYPEVCF=$HAPLOTYPEVCF
 if [ ! -f "$TDIR/germline_maf3.exac.vcf" ]; then
     bsub -o LSF/ -J GERM_${PROJECT} \
         -n 12 -We 59 -R "rusage[mem=32]" \
-        $SDIR/getGermlineMaf.sh ${PROJECT} \
+        $SDIR/getGermlineMaf.sh ${GENOME_BUILD} ${PROJECT} \
         $HAPLOTYPEVCF \
         $TDIR
 fi
