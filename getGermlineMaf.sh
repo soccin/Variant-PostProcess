@@ -95,12 +95,16 @@ else
     echo
     echo "No EXACDB for this GENOME" $GENOME_BUILD
     echo
-    touch $TDIR/germline_maf3.vcf.gz
+    touch $TDIR/germline_maf3.exac.vcf
 fi
 
 echo $0 "Computing CMO MAF"
 
-$SDIR/mkTaylorMAF.py $TDIR/germline.maf2.seq $TDIR/germline.maf2.impact410 $TDIR/germline_maf3.exac.vcf $TDIR/germline.maf2.vep \
+$SDIR/mkTaylorMAF.py \
+    $TDIR/germline.maf2.seq \
+    $TDIR/germline.maf2.impact410 \
+    $TDIR/germline_maf3.exac.vcf \
+    $TDIR/germline.maf2.vep \
     > ${PROJECT}___GERMLINE.vep.maf
 
 echo $0 "DONE"
