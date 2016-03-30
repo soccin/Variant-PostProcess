@@ -187,7 +187,7 @@ outFields=cin.fieldnames+["POS","TAG","LABEL","TriNuc","IMPACT_410","t_var_freq"
                             "Purity","Ploidy","WGD",
                             "seg.mean","cf","tcn","lcn",
                             "est_frac","est_copies"]
-cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t")
+cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t",lineterminator='\n')
 cout.writeheader()
 for ki in sorted(events):
     cout.writerow(events[ki])

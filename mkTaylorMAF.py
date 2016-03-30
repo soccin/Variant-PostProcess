@@ -107,7 +107,7 @@ with open(origMAFFile) as fp:
 
 outFields=cin.fieldnames+["POS","TAG","LABEL","TriNuc","IMPACT_410","t_var_freq","n_var_freq",
                             "ExAC_AC","ExAC_AF","ExAC_AN"]
-cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t")
+cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t",lineterminator='\n')
 
 print commentHeader
 

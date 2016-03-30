@@ -21,7 +21,7 @@ glbs.MinAD=5
 glbs.MinAltFreq=0.01
 
 cin=csv.DictReader(sys.stdin,delimiter="\t")
-cout=csv.DictWriter(sys.stdout,cin.fieldnames,delimiter="\t")
+cout=csv.DictWriter(sys.stdout,cin.fieldnames,delimiter="\t",lineterminator='\n')
 cout.writeheader()
 for recDict in cin:
   try:

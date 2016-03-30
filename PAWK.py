@@ -29,7 +29,7 @@ class CSVStruct(object):
 class PAWK(object):
     def __init__(self, fin=sys.stdin, fout=sys.stdout, header=True, delim="\t"):
         self.cin=csv.DictReader(fin,delimiter=delim)
-        self.cout=csv.DictWriter(fout,self.cin.fieldnames,delimiter="\t")
+        self.cout=csv.DictWriter(fout,self.cin.fieldnames,delimiter="\t",lineterminator='\n')
         if header:
             self.cout.writeheader()
     def __iter__(self):

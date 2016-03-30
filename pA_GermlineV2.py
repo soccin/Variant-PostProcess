@@ -5,7 +5,7 @@ import csv
 
 cin=csv.DictReader(sys.stdin,delimiter="\t")
 fields=cin.fieldnames+["COUNT_REF","COUNT_ALT"]
-cout=csv.DictWriter(sys.stdout,fields,delimiter="\t")
+cout=csv.DictWriter(sys.stdout,fields,delimiter="\t",lineterminator='\n')
 cout.writeheader()
 for rec in cin:
     if rec["GT"]!="0/0" and rec["GT"]!="./.":
