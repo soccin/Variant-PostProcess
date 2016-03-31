@@ -100,13 +100,12 @@ with open(origMAFFile) as fp:
 
         if pos in exacDb:
             r["ExAC_AC"]=exacDb[pos]["AC"]
-            r["ExAC_AF"]=exacDb[pos]["AF"]
             r["ExAC_AN"]=exacDb[pos]["AN"]
 
         events[label]=r
 
 outFields=cin.fieldnames+["POS","TAG","LABEL","TriNuc","IMPACT_410","t_var_freq","n_var_freq",
-                            "ExAC_AC","ExAC_AF","ExAC_AN"]
+                            "ExAC_AC","ExAC_AN"]
 cout=csv.DictWriter(sys.stdout,outFields,delimiter="\t",lineterminator='\n')
 
 print commentHeader
