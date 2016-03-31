@@ -26,7 +26,7 @@ INPUTS=$(ls $BAMDIR/*bam \
 	| perl -ne 'chomp; m|_indelRealigned_recal_(\S+).bam|;print "--bam ",$1,":",$_,"\n"')
 
 /home/socci/Code/Zeng/GetBaseCountsMultiSample/GetBaseCountsMultiSample \
-    --thread 12 \
+    --thread 24 \
 	--filter_improper_pair 0 --fasta $GENOME \
 	--vcf $VCF \
 	--output $OUT \
