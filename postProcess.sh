@@ -131,9 +131,9 @@ $SDIR/tabix -p vcf $TDIR/maf3.vcf.gz
     annotate --annotations $EXACDB \
     --columns AC,AN,AF --output-type v --output $TDIR/maf3.exac.vcf $TDIR/maf3.vcf.gz
 
-$SDIR/fillOutMAF_CBE.sh \
-    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
-FILLOUT_CPID=$!
+#$SDIR/fillOutMAF_CBE.sh \
+#    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
+#FILLOUT_CPID=$!
 fi
 
 cat $TDIR/merge_maf3.vep \
@@ -155,9 +155,9 @@ $PYTHON $SDIR/mkTaylorMAF.py $TDIR/merge_maf3.seq $TDIR/merge_maf3.impact410 $TD
 #echo $0 "Waiting for GERMLINE "$GERMLINE_CPID
 #wait $GERMLINE_CPID
 #echo $0 "DONE"
-echo $0 "Waiting for FILL "$FILLOUT_CPID
-wait $FILLOUT_CPID
-echo $0 "DONE"
+#echo $0 "Waiting for FILL "$FILLOUT_CPID
+#wait $FILLOUT_CPID
+#echo $0 "DONE"
 
-python2.7 $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
+#python2.7 $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
 
