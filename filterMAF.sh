@@ -39,3 +39,19 @@ echo "#BIC::variant_pipeline SVN:r4705+" >>${TMPTAG}.maf0
 echo "#$VTAG" >>${TMPTAG}.maf0
 cat $MAFIN | egrep -v "^#" >>${TMPTAG}.maf0
 
+echo "Applying filter_blacklist_regions"
+$SDIR/wes-filters/applyFilter.sh filter_blacklist_regions.R \
+    ${TMPTAG}.maf0 ${TMPTAG}.maf1
+
+echo "Applying filter_low_conf"
+$SDIR/wes-filters/applyFilter.sh filter_low_conf.R \
+    ${TMPTAG}.maf1 ${TMPTAG}.maf2
+
+echo "Applying filter_ffpe"
+$SDIR/wes-filters/applyFilter.sh filter_ffpe.R \
+    ${TMPTAG}.maf2 ${TMPTAG}.maf3
+
+mv ${TMPTAG}.maf3 $MAFOUT
+
+rm ${TMPTAG}*
+
