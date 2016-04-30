@@ -5,6 +5,7 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 . ../config
 
 CMOMAF=$(ls $PIPELINEDIR/variants/Proj*CMO_MAF.txt)
+
 BAMDIR=$PIPELINEDIR/alignments
 
 WESFBIN=~/Code/Pipelines/CBE/Variant/PostProcessV2/wes-filters
@@ -68,5 +69,19 @@ echo "Applying filter_normal_panel"
 $WESFBIN/applyFilter.sh filter_normal_panel.R mafB mafC -f normalCohortFill.out
 echo "Applying filter_cohort_normals"
 $WESFBIN/applyFilter.sh filter_cohort_normals.R mafC mafD -f ___FILLOUT.maf
-cp mafD $(basename $PROJECTDIR)___SOMATIC_FACETS.vep.filtered.maf
+
+#
+# Figure out if common variants filters was applied
+# in starting CMO maf. If not do so
+#
+
+HAS_FILTER_COLUMN=$(head -100 $CMOMAF | egrep -v "^#" | head -1 | tr '\t' '\n' | fgrep FILTER)
+if [ "$HAS_FILTER_COLUMN" == "" ]; then
+    echo "CMO MAF did not have common_filter"
+    echo "Applying filter_cohort_normals"
+    $WESFBIN/applyFilter.sh filter_common_variants.R mafD mafE
+    cp mafE $(basename $PROJECTDIR)___SOMATIC_FACETS.vep.filtered.maf
+else
+    cp mafD $(basename $PROJECTDIR)___SOMATIC_FACETS.vep.filtered.maf
+fi
 
