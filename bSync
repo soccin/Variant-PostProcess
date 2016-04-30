@@ -5,13 +5,14 @@ LSFBIN=/common/lsf/9.1/linux2.6-glibc2.3-x86_64/bin
 JOBNAME=$1
 
 getLastJobNo() {
-    $LSFBIN/bjobs -UF | fgrep "Job Name" | egrep $JOBNAME \
+    $LSFBIN/bjobs -UF | fgrep "Job Name" | fgrep "<$JOBNAME>" \
         | tail -1 | perl -ne '/Job <(\d+)>/;print "$1\n"'
 }
 
 HOLDJOB=$(getLastJobNo)
 while [ "$HOLDJOB" != "" ]; do
-    echo "Holding on "$HOLDJOB
-    $LSFBIN/bsub -We 1 -w "post_done($HOLDJOB)" -J bSync_$$ -K true
+    echo "JOB =" $JOBNAME "holding on jid =" $HOLDJOB
+    $LSFBIN/bsub -We 1 -w "post_done($HOLDJOB)" -J bSync_${JOBNAME}_$$ -K echo "$JOBNAME"
+    sleep 3
     HOLDJOB=$(getLastJobNo)
 done
