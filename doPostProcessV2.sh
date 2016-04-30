@@ -27,7 +27,7 @@ fi
 
 if [ ! -e normalCohortFill.out ]; then
 echo "maf_fillout.py::NFILL"
-    bsub -m commonHG -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(FFILL)" -We 59 -R "rusage[mem=24]" \
+    bsub -m commonHG -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" -We 59 -R "rusage[mem=24]" \
         $WESFBIN/maf_fillout.py -n 24 -g b37 \
         -m $CMOMAF -o normalCohortFill.out \
         -b $(ls /ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA/*.bam)
