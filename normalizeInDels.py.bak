@@ -63,7 +63,7 @@ with open(args.maf0, 'rb') as input:
   else:
     output=open(args.maf1,'w')
   cin=csv.DictReader(stripCommentsFromStream(input,output),delimiter="\t")
-  cout=csv.DictWriter(output,cin.fieldnames,delimiter="\t",lineterminator="\n")
+  cout=csv.DictWriter(output,cin.fieldnames,delimiter="\t")
   cout.writeheader()
   for r in cin:
 
