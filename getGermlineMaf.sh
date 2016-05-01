@@ -35,13 +35,13 @@ fi
 
 if [ ! -f "$TDIR/germline.maf0" ]; then
     echo $0 "Generating MAF0"
-    $SDIR/vcf2maf0.py -c haplotypecaller -i $VCF -o $TDIR/germline.maf0
+    $PYTHON $SDIR/vcf2maf0.py -c haplotypecaller -i $VCF -o $TDIR/germline.maf0
 fi
 echo $0 "MAF0 ready"
 
-$SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
+$PYTHON $SDIR/pA_GermlineV2.py  <$TDIR/germline.maf0 >$TDIR/germline.maf1
 echo $0 "MAF1 ready"
-$SDIR/oldMAF2tcgaMAF.py $GENOME_BUILD $TDIR/germline.maf1 $TDIR/germline.maf2
+$PYTHON $SDIR/oldMAF2tcgaMAF.py $GENOME_BUILD $TDIR/germline.maf1 $TDIR/germline.maf2
 echo $0 "MAF2 ready"
 
 
@@ -100,7 +100,7 @@ fi
 
 echo $0 "Computing CMO MAF"
 
-$SDIR/mkTaylorMAF.py \
+$PYTHON $SDIR/mkTaylorMAF.py \
     $TDIR/germline.maf2.seq \
     $TDIR/germline.maf2.impact410 \
     $TDIR/germline_maf3.exac.vcf \

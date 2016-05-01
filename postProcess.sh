@@ -63,12 +63,12 @@ fi
 HAPMAF=${PROJECT}___qSomHC_InDels__TCGA_MAF.txt
 
 if [ ! -f "$TDIR/$HAPMAF" ]; then
-    $SDIR/vcf2maf0.py -c haplotypecaller -p $PAIRING -i $HAPLOTYPEVCF \
+    $PYTHON $SDIR/vcf2maf0.py -c haplotypecaller -p $PAIRING -i $HAPLOTYPEVCF \
         -o $TDIR/hap_maf0
-    $SDIR/pA_qSomHC.py <$TDIR/hap_maf0 >$TDIR/hap_maf1
-    $SDIR/oldMAF2tcgaMAF.py ${GENOME_BUILD} $TDIR/hap_maf1 $TDIR/hap_maf2
-    $SDIR/indelOnly.py <$TDIR/hap_maf2 >$TDIR/hap_maf2b
-    $SDIR/normalizeInDels.py $TDIR/hap_maf2b $TDIR/$HAPMAF
+    $PYTHON $SDIR/pA_qSomHC.py <$TDIR/hap_maf0 >$TDIR/hap_maf1
+    $PYTHON $SDIR/oldMAF2tcgaMAF.py ${GENOME_BUILD} $TDIR/hap_maf1 $TDIR/hap_maf2
+    $PYTHON $SDIR/indelOnly.py <$TDIR/hap_maf2 >$TDIR/hap_maf2b
+    $PYTHON $SDIR/normalizeInDels.py $TDIR/hap_maf2b $TDIR/$HAPMAF
 fi
 
 echo $0 "Done with haplotype processing ..."
@@ -84,15 +84,15 @@ echo $0 $MUTECTDIR
 if [ ! -f "$TDIR/merge_maf3" ]; then
     for vcf in $MUTECTDIR/*vcf; do
         BASE=$(basename $vcf | sed 's/.vcf//')
-		PAIR=$($SDIR/getMutectPair.py $PAIRING $vcf)
+		PAIR=$($PYTHON $SDIR/getMutectPair.py $PAIRING $vcf)
 		normal=$(echo $PAIR | perl -ne '/normal:=(\S+) tumor:=(\S+)$/; print $1')
 		tumor=$(echo $PAIR | perl -ne '/normal:=(\S+) tumor:=(\S+)$/; print $2')
         echo $vcf, $normal, $tumor
-        $SDIR/vcf2maf0.py -c mutect -p $PAIRING \
+        $PYTHON $SDIR/vcf2maf0.py -c mutect -p $PAIRING \
             -t $tumor -n $normal -i $vcf \
             -o $TDIR/mt_maf0
-        $SDIR/DMP_rescue.py  <$TDIR/mt_maf0 >$TDIR/mt_maf1
-        $SDIR/oldMAF2tcgaMAF.py ${GENOME_BUILD} $TDIR/mt_maf1 $TDIR/mt_maf2
+        $PYTHON $SDIR/DMP_rescue.py  <$TDIR/mt_maf0 >$TDIR/mt_maf1
+        $PYTHON $SDIR/oldMAF2tcgaMAF.py ${GENOME_BUILD} $TDIR/mt_maf1 $TDIR/mt_maf2
         awk -F"\t" '$40=="FILTER"||$40=="PASS"{print $0}' $TDIR/mt_maf2 \
             >$TDIR/${BASE}___DMPFilter_TCGA_MAF.txt
     done
@@ -167,7 +167,7 @@ else
     touch $TDIR/merge_maf3.impact410
 fi
 
-$SDIR/mkTaylorMAF.py \
+$PYTHON $SDIR/mkTaylorMAF.py \
     $TDIR/merge_maf3.seq \
     $TDIR/merge_maf3.impact410 \
     $TDIR/maf3.exac.vcf \
@@ -181,5 +181,5 @@ echo $0 "Waiting for FILL "$FILLOUT_CPID
 wait $FILLOUT_CPID
 echo $0 "DONE"
 
-python2.7 $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
+$PYTHON $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
 
