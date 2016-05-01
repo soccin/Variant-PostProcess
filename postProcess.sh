@@ -128,10 +128,10 @@ $PERL $VCF2MAF/maf2maf.pl \
 
 fi
 
-$SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
-$SDIR/fillOutMAF_CBE.sh \
-    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
-FILLOUT_CPID=$!
+#$SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
+#SDIR/fillOutMAF_CBE.sh \
+#    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
+#FILLOUT_CPID=$!
 
 if [ "$EXACDB" != "" ]; then
     cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf
@@ -177,9 +177,9 @@ $PYTHON $SDIR/mkTaylorMAF.py \
 #echo $0 "Waiting for GERMLINE "$GERMLINE_CPID
 #wait $GERMLINE_CPID
 #echo $0 "DONE"
-echo $0 "Waiting for FILL "$FILLOUT_CPID
-wait $FILLOUT_CPID
-echo $0 "DONE"
+#echo $0 "Waiting for FILL "$FILLOUT_CPID
+#wait $FILLOUT_CPID
+#echo $0 "DONE"
 
-$PYTHON $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
+#$PYTHON $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
 
