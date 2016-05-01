@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 import re
 import csv
@@ -6,7 +7,7 @@ from GeneralizedRead import GeneralizedRead, MutectRead, GenericSomaticRead, Tum
 from collections import defaultdict
 
 class VcfParser:
-  def __init__(self, file, tumor2normals=None, tumor=None, normal=None, verbose=False):
+  def __init__(self, file, tumor2normals=None, tumor=None, normal=None, verbose=False, inTsv=False):
     self.file = file
     self.pairMap = tumor2normals
     self.tumor = tumor
@@ -17,6 +18,7 @@ class VcfParser:
     self.extraInfo = {}
     self.caller = ""
     self.mode = None
+    self.inTsv = inTsv
     if(verbose):
       self.mode = "VERBOSE"
   
@@ -30,11 +32,11 @@ class VcfParser:
                 # Skip blank lines
                 continue
             elif len(F)!=2:
-                print >>sys.stderr, "Invalid Pairing File Line"
-                print >>sys.stderr, "["+line[:-1]+"]"
+                print("Invalid Pairing File Line", file=sys.stderr)
+                print(sys.stderr, "["+line[:-1]+"]", file=sys.stderr)
                 return None
 
-            if re.match('NA', F[0], re.IGNORECASE) or re.match('NA', F[1], re.IGNORECASE):
+            if re.match('^NA$', F[0], re.IGNORECASE) or re.match('^NA$', F[1], re.IGNORECASE):
                 continue
 
             pairMap[F[1]].append(F[0])
@@ -192,14 +194,14 @@ class VcfParser:
         alt = rec.ALT
         if not alt[0]:
           alt = '.'
-        positionSamples[sample.sample] = readClass(".", sample.sample, rec.CHROM, rec.POS, rec.REF, alt, rec.FILTER, rec.QUAL, rec.ID, "0/0", 0, 0, adRef, 0, uniqInfo, "")
+        positionSamples[sample.sample] = readClass(".", sample.sample, rec.CHROM, rec.POS, rec.REF, alt, rec.FILTER, rec.QUAL, rec.ID, "0/0", 0, 0, adRef, 0, uniqInfo, "", self.inTsv)
         continue
       if "GT" in sample.data._fields and (not sample.data.GT or sample.data.GT=="./."):
         positionSamples[sample.sample] = None
         continue
       parseMap = self.parseSample(rec, sample)
       uniqFormat = self.populateUniqFormats(sample)
-      positionSamples[sample.sample] =  readClass(parseMap["gene"], parseMap["sample"], parseMap["chrom"], parseMap["pos"], parseMap["ref"], parseMap["alt"], parseMap["filter"], parseMap["qual"], parseMap["id"], parseMap["gt"], parseMap["gq"], parseMap["nraf"], parseMap["adRef"], parseMap["adAlt"], uniqInfo, uniqFormat)
+      positionSamples[sample.sample] =  readClass(parseMap["gene"], parseMap["sample"], parseMap["chrom"], parseMap["pos"], parseMap["ref"], parseMap["alt"], parseMap["filter"], parseMap["qual"], parseMap["id"], parseMap["gt"], parseMap["gq"], parseMap["nraf"], parseMap["adRef"], parseMap["adAlt"], uniqInfo, uniqFormat, self.inTsv)
     if self.pairMap:
       for tumor, normals in self.pairMap.iteritems():
         for normal in normals:
@@ -217,8 +219,8 @@ class VcfParser:
     return reads
 
 class SomaticParser(VcfParser): #generic somatic parser that doesn't use proper sample names but instead uses thing like "NORMAL" and "TUMOR"
-  def __init__(self, file, tumor2normals, tumor, normal, verbose):
-    VcfParser.__init__(self, file, tumor2normals, tumor, normal, verbose)
+  def __init__(self, file, tumor2normals, tumor, normal, verbose, inTsv):
+    VcfParser.__init__(self, file, tumor2normals, tumor, normal, verbose, inTsv)
     self.extraInfo = {'TUMOR' : tumor, "NORMAL" : normal }
 
   def parse(self, generalizedRead, fileOut):
