@@ -40,16 +40,12 @@ echo "fillOutCBE::CFILL"
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $CMOMAF \
-        ___FILLOUT_DUP.vcf
+        ___FILLOUT.vcf
 fi
 
 #SYNC CFILL
 
 $SDIR/bSync ${LSFTAG}_CFILL
-
-(egrep "^#" ___FILLOUT_DUP.vcf; \
-    cat ___FILLOUT_DUP.vcf | egrep -v "^#" | sort | uniq) \
-    >___FILLOUT.vcf
 
 echo "vcf2MultiMAF::FILL2"
 bsub -m commonHG -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=22]" \
