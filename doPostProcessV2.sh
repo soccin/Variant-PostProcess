@@ -17,6 +17,27 @@ FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ff
 
 LSFTAG=$(uuidgen)
 
+#
+# See if there is a patient file to identify normal samples
+#
+
+PATIENTFILE=$(find $PROJECTDIR | fgrep _sample_patient.txt)
+if [ "$PATIENTFILE" != "" ]; then
+    cat $PATIENTFILE  | awk -F"\t" '$5=="Normal"{print $2}' >_normalSamples
+else
+    PAIRINGFILE=$(find $PROJECTDIR | fgrep _sample_pairing.txt)
+    if [ "$PAIRINGFILE" != "" ]; then
+        echo "WARNING: Can not find PATIENT FILE"
+        echo "PAIRING file used to infer normals; might not be correct"
+        cat $PAIRINGFILE  | cut -f1 | sort | uniq >_normalSamples
+    else
+        echo "FATAL ERROR: Cannot find PATIENT nor PAIRINGFILE"
+        echo "Can not determine normal samples"
+        exit 1
+    fi
+fi
+
+
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
     bsub -m commonHG -We 59 -n 24 -o LSF/ -J ${LSFTAG}_FFILL -R "rusage[mem=24]" \
@@ -64,7 +85,7 @@ $WESFBIN/applyFilter.sh filter_ffpe_pool.R mafA mafB -f ffpePoolFill.out
 echo "Applying filter_normal_panel"
 $WESFBIN/applyFilter.sh filter_normal_panel.R mafB mafC -f normalCohortFill.out
 echo "Applying filter_cohort_normals"
-$WESFBIN/applyFilter.sh filter_cohort_normals.R mafC mafD -f ___FILLOUT.maf
+$WESFBIN/applyFilter.sh filter_cohort_normals.R mafC mafD -f ___FILLOUT.maf -N _normalSamples
 
 #
 # Figure out if common variants filters was applied
