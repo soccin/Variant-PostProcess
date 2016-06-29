@@ -77,8 +77,22 @@ $SDIR/bSync ${LSFTAG}_FILL2
 #SYNC NFILL
 $SDIR/bSync ${LSFTAG}_NFILL
 
-echo "ApplyAllFilters"
-$SDIR/filterMAF.sh $CMOMAF mafA
+#
+# Check if BIC-pipeline is applying any filters
+#
+
+BIC_FILTERS=$(egrep "^#WES-FILTER" $CMOMAF  | awk '{print $2}' | sort  | tr '\n' ';')
+
+if [ "$BIC_FILTERS" =="" ]; then
+    echo "ApplyFilters blacklist, ffpe, low_conf"
+    $SDIR/filterMAF.sh $CMOMAF mafA
+else
+    echo "the following filters have been applied skipping SDIR/filterMAF.sh"
+    echo
+    echo $BIC_FILTERS
+    echo
+    cp $CMOMAF mafA
+fi
 
 echo "Applying filter_ffpe_pool"
 $WESFBIN/applyFilter.sh filter_ffpe_pool.R mafA mafB -f ffpePoolFill.out
