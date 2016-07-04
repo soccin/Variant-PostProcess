@@ -17,6 +17,10 @@ FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ff
 
 LSFTAG=$(uuidgen)
 
+PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
+echo PROJECTNO=$PROJECTNO
+
+
 #
 # See if there is a patient file to identify normal samples
 #
@@ -55,7 +59,7 @@ echo "maf_fillout.py::NFILL"
         -b $(ls /ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA/*.bam)
 fi
 
-if [ ! -e ___FILLOUT_DUP.vcf ]; then
+if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
     bsub -m commonHG -o LSF/ -J ${LSFTAG}_CFILL -We 59 -n 24 -R "rusage[mem=22]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
@@ -83,7 +87,7 @@ $SDIR/bSync ${LSFTAG}_NFILL
 
 BIC_FILTERS=$(egrep "^#WES-FILTER" $CMOMAF  | awk '{print $2}' | sort  | tr '\n' ';')
 
-if [ "$BIC_FILTERS" =="" ]; then
+if [ "$BIC_FILTERS" == "" ]; then
     echo "ApplyFilters blacklist, ffpe, low_conf"
     $SDIR/filterMAF.sh $CMOMAF mafA
 else
@@ -91,7 +95,14 @@ else
     echo
     echo $BIC_FILTERS
     echo
-    cp $CMOMAF mafA
+    if [ "$BIC_FILTERS" == "filter_blacklist_regions.R;filter_ffpe.R;filter_low_conf.R;" ]; then
+        cp $CMOMAF mafA
+    else
+        echo "FATAL ERROR"
+        echo "Note the filters we were expecting"
+        echo "    filter_blacklist_regions.R;filter_ffpe.R;filter_low_conf.R;"
+        exit 1
+    fi
 fi
 
 echo "Applying filter_ffpe_pool"
@@ -111,8 +122,8 @@ if [ "$HAS_FILTER_COLUMN" == "" ]; then
     echo "CMO MAF did not have common_filter"
     echo "Applying filter_cohort_normals"
     $WESFBIN/applyFilter.sh filter_common_variants.R mafD mafE
-    cp mafE $(basename $PROJECTDIR)___SOMATIC_FACETS.vep.filtered.maf
+    cp mafE ${PROJECTNO}___SOMATIC_FACETS.vep.filtered.maf
 else
-    cp mafD $(basename $PROJECTDIR)___SOMATIC_FACETS.vep.filtered.maf
+    cp mafD ${PROJECTNO}___SOMATIC_FACETS.vep.filtered.maf
 fi
 
