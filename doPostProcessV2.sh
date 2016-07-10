@@ -127,3 +127,4 @@ else
     cp mafD ${PROJECTNO}___SOMATIC_FACETS.vep.filtered.maf
 fi
 
+mv ___FILLOUT.maf ${PROJECTNO}___FILLOUT.maf
