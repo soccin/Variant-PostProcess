@@ -25,12 +25,15 @@ echo PROJECTNO=$PROJECTNO
 # See if there is a patient file to identify normal samples
 #
 
-PATIENTFILE=$(find $PROJECTDIR | fgrep _sample_patient.txt)
+PATIENTFILE=$(ls -d $PROJECTDIR/* | fgrep _sample_patient.txt)
+
 if [ "$PATIENTFILE" != "" ]; then
+    echo "Using PATIENTFILE="$PATIENTFILE
     cat $PATIENTFILE  | awk -F"\t" '$5=="Normal"{print $2}' >_normalSamples
 else
-    PAIRINGFILE=$(find $PROJECTDIR | fgrep _sample_pairing.txt)
+    PAIRINGFILE=$(ls -d $PROJECTDIR/* | fgrep _sample_pairing.txt)
     if [ "$PAIRINGFILE" != "" ]; then
+        echo "Using PAIRINGFILE="$PAIRINGFILE
         echo "WARNING: Can not find PATIENT FILE"
         echo "PAIRING file used to infer normals; might not be correct"
         cat $PAIRINGFILE  | cut -f1 | sort | uniq >_normalSamples
@@ -41,6 +44,15 @@ else
     fi
 fi
 
+NUM_NORMALS=$(wc -l _normalSamples | awk '{print $1}')
+if [ "$NUM_NORMALS" == "0" ]; then
+    echo
+    echo "FATAL ERROR: Found 0 Normals; if this is really true implement override"
+    echo
+    exit 1
+fi
+
+exit
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
