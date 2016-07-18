@@ -2,21 +2,28 @@
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
-if [ $# -ne 2 ]; then
-	echo "usage: postProcess.sh PairingFile PipelineOutputDir"
+if [ $# -lt 2 ]; then
+	echo "usage: postProcess.sh PairingFile PipelineOutputDir [PROJNO]"
 	exit
 fi
 
 source $SDIR/paths.sh
 
+
+
 PAIRING=$1
 PIPEOUT=$2
 PIPEOUT=$(echo $PIPEOUT | sed 's/\/$//')
-PROJECT=$(echo $PIPEOUT | perl -ne 'm[(/|^)(Proj_[^/\s]*)]; print $2')
-if [ "$PROJECT" == "" ]; then
-    echo "ERROR unable to parse project number from pipeline output dir"
-    echo $PIPEOUT
-    exit 1
+
+if [ $# -eq 3 ]; then
+    PROJECT=$3
+else
+    PROJECT=$(echo $PIPEOUT | perl -ne 'm[(/|^)(Proj_[^/\s]*)]; print $2')
+    if [ "$PROJECT" == "" ]; then
+        echo "ERROR unable to parse project number from pipeline output dir"
+        echo $PIPEOUT
+        exit 1
+    fi
 fi
 echo PROJECT=$PROJECT
 
@@ -121,6 +128,8 @@ $PERL $VCF2MAF/maf2maf.pl \
     --vep-path $VEPPATH \
 	--vep-data $VEPPATH \
 	--ref-fasta $TDIR/$(basename $GENOME) \
+    --species mus_musculus \
+    --ncbi-build GRCm38 \
 	--retain-cols Center,Verification_Status,Validation_Status,Mutation_Status,Sequencing_Phase,Sequence_Source,Validation_Method,Score,BAM_file,Sequencer,Tumor_Sample_UUID,Matched_Norm_Sample_UUID,Caller \
     --custom-enst $MSK_ISOFORMS \
 	--input-maf $TDIR/merge_maf3 \
