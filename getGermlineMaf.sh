@@ -52,6 +52,8 @@ $PERL $VCF2MAF/maf2maf.pl \
     --vep-path $VEPPATH \
     --vep-data $VEPPATH \
     --ref-fasta $TDIR/$(basename $GENOME) \
+    --species mus_musculus \
+    --ncbi-build GRCm38 \
     --retain-cols Center,Verification_Status,Validation_Status,Mutation_Status,Sequencing_Phase,Sequence_Source,Validation_Method,Score,BAM_file,Sequencer,Tumor_Sample_UUID,Matched_Norm_Sample_UUID,Caller \
     --custom-enst $MSK_ISOFORMS \
     --input-maf $TDIR/germline.maf2 \
