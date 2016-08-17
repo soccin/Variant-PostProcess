@@ -28,6 +28,11 @@ case $GENOME_MD5 in
     echo "mm10_hBRAF_V600E"
     ;;
 
+    440c57bf0ca8a948fcc83adcb6d84b7c)
+    # UCSC mm10+hGNA11_Q209L
+    echo "mm10_hGNA11_Q209L"
+    ;;
+
     *)
     echo "unknown" $GENOME_MD5
     ;;
