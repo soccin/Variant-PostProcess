@@ -137,24 +137,6 @@ $PERL $VCF2MAF/maf2maf.pl \
 
 fi
 
-#$SDIR/maf2vcfSimple.sh $GENOME_BUILD $TDIR/merge_maf3 >$TDIR/merge_maf3.vcf
-#SDIR/fillOutMAF_CBE.sh \
-#    $PIPEOUT/alignments $TDIR/merge_maf3.vcf $TDIR/fillOut.out &
-#FILLOUT_CPID=$!
-
-if [ "$EXACDB" != "" ]; then
-    cat $TDIR/merge_maf3.vcf | sed 's/^chr//' > $TDIR/maf3.vcf
-    $SDIR/bgzip $TDIR/maf3.vcf
-    $SDIR/tabix -p vcf $TDIR/maf3.vcf.gz
-    /opt/common/CentOS_6/bcftools/bcftools-1.2/bin/bcftools \
-        annotate --annotations $EXACDB \
-        --columns AC,AN,AF --output-type v --output $TDIR/maf3.exac.vcf $TDIR/maf3.vcf.gz
-else
-    echo
-    echo "No EXACDB for this GENOME" $GENOME_BUILD
-    echo
-    touch $TDIR/maf3.exac.vcf
-fi
 
 cat $TDIR/merge_maf3.vep \
     | egrep -v "(^#|^Hugo_Symbol)" \
@@ -165,30 +147,6 @@ $BEDTOOLS slop -g $SDIR/db/${GENOME_BUILD}.genome -b 1 -i $TDIR/merge_maf3.bed \
     | $BEDTOOLS getfasta -tab \
     -fi $GENOME -fo $TDIR/merge_maf3.seq -bed -
 
-if [ -e "$SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed" ]; then
-    $BEDTOOLS intersect -a $TDIR/merge_maf3.bed \
-        -b $SDIR/db/IMPACT_410_${GENOME_BUILD}_targets_plus3bp.bed -wa \
-        | $BEDTOOLS sort -i - | awk '{print $1":"$2+1"-"$3}' | uniq >$TDIR/merge_maf3.impact410
-else
-    echo
-    echo "No IMPACT BED for this GENOME"
-    echo
-    touch $TDIR/merge_maf3.impact410
-fi
-
-$PYTHON $SDIR/mkTaylorMAF.py \
-    $TDIR/merge_maf3.seq \
-    $TDIR/merge_maf3.impact410 \
-    $TDIR/maf3.exac.vcf \
-    $TDIR/merge_maf3.vep \
-    > ${PROJECT}___SOMATIC.vep.maf
-
-#echo $0 "Waiting for GERMLINE "$GERMLINE_CPID
-#wait $GERMLINE_CPID
-#echo $0 "DONE"
-#echo $0 "Waiting for FILL "$FILLOUT_CPID
-#wait $FILLOUT_CPID
-#echo $0 "DONE"
-
-#$PYTHON $SDIR/zeng2MAFFill $TDIR/merge_maf3.vep $TDIR/fillOut.out >${PROJECT}___FILLOUT.vep.maf
-
+head -100 merge_maf3.vep | egrep "^#" > ${PROJECT}___SOMATIC.vep.maf
+python2.7 $SDIR/annotateMAF.py >> ${PROJECT}___SOMATIC.vep.maf
+egrep -v "^#" merge_maf3.vep >> ${PROJECT}___SOMATIC.vep.maf
