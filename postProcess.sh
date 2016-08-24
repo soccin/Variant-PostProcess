@@ -54,13 +54,13 @@ echo HAPLOTYPEVCF=$HAPLOTYPEVCF
 
 # Germline calls
 
-if [ ! -f "$TDIR/germline_maf3.exac.vcf" ]; then
-    bsub -o LSF/ -J GERM_${PROJECT} \
-        -n 12 -We 59 -R "rusage[mem=32]" \
-        $SDIR/getGermlineMaf.sh ${GENOME_BUILD} ${PROJECT} \
-        $HAPLOTYPEVCF \
-        $TDIR
-fi
+#if [ ! -f "$TDIR/germline_maf3.exac.vcf" ]; then
+#    bsub -o LSF/ -J GERM_${PROJECT} \
+#        -n 12 -We 59 -R "rusage[mem=32]" \
+#        $SDIR/getGermlineMaf.sh ${GENOME_BUILD} ${PROJECT} \
+#        $HAPLOTYPEVCF \
+#        $TDIR
+#fi
 
 #
 # Get indels from Hapolotype caller
