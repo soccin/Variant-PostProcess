@@ -147,6 +147,6 @@ $BEDTOOLS slop -g $SDIR/db/${GENOME_BUILD}.genome -b 1 -i $TDIR/merge_maf3.bed \
     | $BEDTOOLS getfasta -tab \
     -fi $GENOME -fo $TDIR/merge_maf3.seq -bed -
 
-head -100 merge_maf3.vep | egrep "^#" > ${PROJECT}___SOMATIC.vep.maf
+head -100 $TDIR/merge_maf3.vep | egrep "^#" > ${PROJECT}___SOMATIC.vep.maf
 python2.7 $SDIR/annotateMAF.py >> ${PROJECT}___SOMATIC.vep.maf
-egrep -v "^#" merge_maf3.vep >> ${PROJECT}___SOMATIC.vep.maf
+egrep -v "^#" $TDIR/merge_maf3.vep >> ${PROJECT}___SOMATIC.vep.maf
