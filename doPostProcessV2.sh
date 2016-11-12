@@ -71,7 +71,7 @@ fi
 
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
-    bsub -m commonHG -o LSF/ -J ${LSFTAG}_CFILL -We 59 -n 24 -R "rusage[mem=22]" \
+    bsub -m commonHG -o LSF/ -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $CMOMAF \
