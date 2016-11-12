@@ -33,9 +33,9 @@ if [ "$PATIENTFILE" != "" ]; then
 else
     PAIRINGFILE=$(ls -d $PROJECTDIR/* | fgrep _sample_pairing.txt)
     if [ "$PAIRINGFILE" != "" ]; then
-        echo "Using PAIRINGFILE="$PAIRINGFILE
         echo "WARNING: Can not find PATIENT FILE"
         echo "PAIRING file used to infer normals; might not be correct"
+        echo "Using PAIRINGFILE="$PAIRINGFILE
         cat $PAIRINGFILE  | cut -f1 | sort | uniq >_normalSamples
     else
         echo "FATAL ERROR: Cannot find PATIENT nor PAIRINGFILE"
@@ -51,8 +51,6 @@ if [ "$NUM_NORMALS" == "0" ]; then
     echo
     exit 1
 fi
-
-exit
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
