@@ -132,9 +132,16 @@ if [ "$HAS_FILTER_COLUMN" == "" ]; then
     echo "CMO MAF did not have common_filter"
     echo "Applying filter_cohort_normals"
     $WESFBIN/applyFilter.sh filter_common_variants.R mafD mafE
-    cp mafE ${PROJECTNO}___SOMATIC_FACETS.vep.filtered.maf
+    cp mafE mafFinal
 else
-    cp mafD ${PROJECTNO}___SOMATIC_FACETS.vep.filtered.maf
+    cp mafD mafFinal
 fi
 
-mv ___FILLOUT.maf ${PROJECTNO}___FILLOUT.maf
+
+#
+# Get rid of GL chromosomes
+#
+
+cat mafFinal | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___SOMATIC_FACETS.vep.filtered.maf
+
+cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.maf
