@@ -1,15 +1,11 @@
-# Variant-PostProcess (v2)
+# Variant-PostProcess (v3)
 
-## This version does not fix the bug with overlapping in/del's in haplotype
+This version fixes the problem with overlapping IN/DEL's in Haplotype VCF. It first fixes
+the Haplotype VCF and then uses the BIC post routines.
 
-New version which assumes main pipeline is running the steps of the previous PostProcessV1
+* `FixMultiInDel/fixMultiInDel.sh`
 
-This version starts with the CMO_MAF.txt file created by the BIC pipeline which does all of the SOMATIC and FACETS stuff of version 1 post.
+* `variants_pipeline/haploTect_merge.pl`
 
-Need to do the following:
+* FACETS_MERGE
 
-* wes-filters
-
-* FILLOUT
-
-* Germline
