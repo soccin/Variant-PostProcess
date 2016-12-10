@@ -28,14 +28,16 @@ $SDIR/FixMultiInDel/fixMultiInDel.sh \
 
 echo "done"
 
-exit
-
+echo -n "running haploTect_merge..."
 $BICPIPEDIR/haploTect_merge.pl \
     -config $BICPIPEDIR/variants_pipeline_config.txt \
     -pre $PROJECTNO \
     -pair $PAIRINGFILE \
     -species $GENOME \
-    -exac_vcf /opt/common/CentOS_6/vep/v86/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz
+    -exac_vcf /opt/common/CentOS_6/vep/v86/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
     -output $ODIR \
     -mutect_dir $PIPELINEDIR/variants/snpsIndels/mutect \
     -hc_vcf $ODIR/___FixInDels.vcf
+
+echo "done"
+
