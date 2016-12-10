@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
+SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
 . ../config
 
@@ -15,8 +16,16 @@ echo PROJECTNO=$PROJECTNO
 # from haplotype caller
 #
 
+bsub -m commonHG -We 59 -o LSF/ -J ${LSFTAG}_MERGE \
+$SDIR/getMergedMAF.sh \
+    $PROJECTNO \
+    $PIPELINEDIR \
+    $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
 
-
+#$FACETS_SUITE/facets mafAnno \
+#    -m $output/variants/snpsIndels/haplotect/$pre\_haplotect_VEP_MAF.txt \
+#    -f $output/variants/copyNumber/facets/facets_mapping.txt \
+#    -o $output/intFiles/$pre\_CMO_MAF_intermediate.txt`
 
 exit
 
