@@ -4,53 +4,36 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
 . ../config
 
-CMOMAF=$(ls $PIPELINEDIR/variants/Proj*CMO_MAF.txt)
-
-BAMDIR=$PIPELINEDIR/alignments
-
-WESFBIN=~/Code/Pipelines/CBE/Variant/PostProcessV2/wes-filters
-POSTDIR=~/Code/Pipelines/CBE/Variant/PostProcessV2
-NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
-
-FFPEPOOLDIR=/ifs/res/share/soccin/Case_201601/Proj_06049_Pool/r_001
-FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
-
 LSFTAG=$(uuidgen)
 
 PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
 echo PROJECTNO=$PROJECTNO
 
-
+######################################################################
 #
-# See if there is a patient file to identify normal samples
+# Regenerate MergedMAF but first fix problem with overlapping in/del's
+# from haplotype caller
 #
 
-PATIENTFILE=$(ls -d $PROJECTDIR/* | fgrep _sample_patient.txt)
 
-if [ "$PATIENTFILE" != "" ]; then
-    echo "Using PATIENTFILE="$PATIENTFILE
-    cat $PATIENTFILE  | awk -F"\t" '$5=="Normal"{print $2}' >_normalSamples
-else
-    PAIRINGFILE=$(ls -d $PROJECTDIR/* | fgrep _sample_pairing.txt)
-    if [ "$PAIRINGFILE" != "" ]; then
-        echo "WARNING: Can not find PATIENT FILE"
-        echo "PAIRING file used to infer normals; might not be correct"
-        echo "Using PAIRINGFILE="$PAIRINGFILE
-        cat $PAIRINGFILE  | cut -f1 | sort | uniq >_normalSamples
-    else
-        echo "FATAL ERROR: Cannot find PATIENT nor PAIRINGFILE"
-        echo "Can not determine normal samples"
-        exit 1
-    fi
-fi
 
-NUM_NORMALS=$(wc -l _normalSamples | awk '{print $1}')
-if [ "$NUM_NORMALS" == "0" ]; then
-    echo
-    echo "FATAL ERROR: Found 0 Normals; if this is really true implement override"
-    echo
-    exit 1
-fi
+
+
+######################################################################
+######################################################################
+#
+# Stuff from version 2
+#
+
+CMOMAF=$(ls $PIPELINEDIR/variants/Proj*CMO_MAF.txt)
+
+BAMDIR=$PIPELINEDIR/alignments
+
+WESFBIN=$SDIR/wes-filters
+NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
+
+FFPEPOOLDIR=/ifs/res/share/soccin/Case_201601/Proj_06049_Pool/r_001
+FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
@@ -84,7 +67,7 @@ $SDIR/bSync ${LSFTAG}_CFILL
 
 echo "vcf2MultiMAF::FILL2"
 bsub -m commonHG -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=22]" \
-    $POSTDIR/vcf2MultiMAF_b37.sh ___FILLOUT.vcf
+    $SDIR/vcf2MultiMAF_b37.sh ___FILLOUT.vcf
 
 $SDIR/bSync ${LSFTAG}_FILL2
 
