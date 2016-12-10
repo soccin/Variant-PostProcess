@@ -1,6 +1,8 @@
 #!/bin/bash
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
+SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
+
 BICPIPEDIR=/ifs/work/socci/Pipelines/CBE/variants_pipeline
 
 if [ "$#" != "3" ]; then
@@ -30,6 +32,7 @@ echo "done"
 
 echo -n "running haploTect_merge..."
 $BICPIPEDIR/haploTect_merge.pl \
+    -svnRev "GetMergedMAF.sh::$SVERSION" \
     -config $BICPIPEDIR/variants_pipeline_config.txt \
     -pre $PROJECTNO \
     -pair $PAIRINGFILE \
