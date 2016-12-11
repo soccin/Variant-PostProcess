@@ -3,6 +3,8 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
+FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
+
 . ../config
 
 LSFTAG=$(uuidgen)
@@ -24,11 +26,13 @@ $SDIR/getMergedMAF.sh \
 
 $SDIR/bSync ${LSFTAG}_MERGE
 
-#$FACETS_SUITE/facets mafAnno \
-#    -m $output/variants/snpsIndels/haplotect/$pre\_haplotect_VEP_MAF.txt \
-#    -f $output/variants/copyNumber/facets/facets_mapping.txt \
-#    -o $output/intFiles/$pre\_CMO_MAF_intermediate.txt`
+bsub -m commonHG -We 59 -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
+$FACETS_SUITE/facets mafAnno \
+    -m _mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt \
+    -f $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
+    -o ${PROJECTNO}_haplotect_VEP,FACETS_MAF.txt
 
+$SDIR/bSync ${LSFTAG}_FACETS
 
 
 exit
