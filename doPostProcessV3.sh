@@ -3,6 +3,9 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
+# 
+JC_TIMELIMIT=""
+
 FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
 
 . ../config
@@ -18,7 +21,7 @@ echo PROJECTNO=$PROJECTNO
 # from haplotype caller
 #
 
-bsub -m commonHG -We 59 -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
+bsub -m commonHG ${JC_TIMELIMIT} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
 $SDIR/getMergedMAF.sh \
     $PROJECTNO \
     $PIPELINEDIR \
@@ -26,14 +29,13 @@ $SDIR/getMergedMAF.sh \
 
 $SDIR/bSync ${LSFTAG}_MERGE
 
-bsub -m commonHG -We 59 -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
+bsub -m commonHG ${JC_TIMELIMIT} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
 $FACETS_SUITE/facets mafAnno \
     -m _mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt \
     -f $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     -o ${PROJECTNO}_haplotect_VEP,FACETS_MAF.txt
 
 $SDIR/bSync ${LSFTAG}_FACETS
-
 
 exit
 
@@ -55,7 +57,7 @@ FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ff
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
-    bsub -m commonHG -We 59 -n 24 -o LSF/ -J ${LSFTAG}_FFILL -R "rusage[mem=24]" \
+    bsub -m commonHG ${JC_TIMELIMIT} -n 24 -o LSF/ -J ${LSFTAG}_FFILL -R "rusage[mem=24]" \
          $WESFBIN/maf_fillout.py -n 24 -g b37 \
          -m $CMOMAF \
          -o ffpePoolFill.out \
@@ -64,7 +66,7 @@ fi
 
 if [ ! -e normalCohortFill.out ]; then
 echo "maf_fillout.py::NFILL"
-    bsub -m commonHG -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" -We 59 -R "rusage[mem=24]" \
+    bsub -m commonHG -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" ${JC_TIMELIMIT} -R "rusage[mem=24]" \
         $WESFBIN/maf_fillout.py -n 24 -g b37 \
         -m $CMOMAF -o normalCohortFill.out \
         -b $(ls /ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA/*.bam)
