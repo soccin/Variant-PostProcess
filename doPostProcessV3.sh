@@ -138,18 +138,6 @@ else
     cp mafD mafFinal
 fi
 
-###################################################################################
-# Add facets
-#
-#bsub -m commonHG ${JC_TIMELIMIT} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
-#$FACETS_SUITE/facets mafAnno \
-#    -m ${PROJECTNO}___SOMATIC.vep.filtered_V3.maf \
-#    -f $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
-#    -o ${PROJECTNO}_haplotect_VEP,FACETS_MAF.txt
-
-#$SDIR/bSync ${LSFTAG}_FACETS
-
-
 #
 # Get rid of GL chromosomes
 #
@@ -157,3 +145,15 @@ fi
 cat mafFinal | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___SOMATIC.vep.filtered.V3.maf
 
 cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V3.maf
+
+###################################################################################
+# Add facets
+#
+
+bsub -m commonHG ${JC_TIMELIMIT} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
+$FACETS_SUITE/facets mafAnno \
+    -m ${PROJECTNO}___SOMATIC.vep.filtered.V3.maf\
+    -f $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
+    -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3.maf
+
+$SDIR/bSync ${LSFTAG}_FACETS
