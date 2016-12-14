@@ -44,7 +44,8 @@ FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ff
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
-    bsub -m commonHG ${JC_TIMELIMIT} -n 24 -o LSF/ -J ${LSFTAG}_FFILL -R "rusage[mem=24]" \
+    bsub -m commonHG ${JC_TIMELIMIT} -n 24 -o LSF/ \
+	-J ${LSFTAG}_FFILL -R "rusage[mem=24]" \
          $WESFBIN/maf_fillout.py -n 24 -g b37 \
          -m $BICMAF \
          -o ffpePoolFill.out \
@@ -61,7 +62,8 @@ fi
 
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
-    bsub -m commonHG ${JC_TIMELIMIT} -o LSF/ -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
+    bsub -m commonHG ${JC_TIMELIMIT} -o LSF/ \
+      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $BICMAF \
