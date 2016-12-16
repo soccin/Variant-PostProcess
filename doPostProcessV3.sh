@@ -162,4 +162,14 @@ $FACETS_SUITE/facets mafAnno \
     -f $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3.maf
 
+EXIT=$?
+
 $SDIR/bSync ${LSFTAG}_FACETS
+
+if [ "$EXIT" != "0" ]; then
+    echo
+    echo FACETS ERROR EXIT=$EXIT
+    echo
+    exit $EXIT
+fi
+
