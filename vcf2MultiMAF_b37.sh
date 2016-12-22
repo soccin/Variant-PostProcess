@@ -30,6 +30,7 @@ for si in $SAMPS; do
         --vep-data $VEPPATH \
         --ref-fasta $GENOME \
         --custom-enst $MSK_ISOFORMS \
+        --filter-vcf $VEPPATH/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
         --tumor-id $si \
         --output-maf split___${BASE}___${si}___FILLOUT.maf
 
