@@ -7,8 +7,8 @@ SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-
 # Set small limit for debugging
 #
 JC_TIMELIMIT="-We 59"
-JC_TIMELIMIT_LONG="-We 59"
-#JC_TIMELIMIT_LONG=""
+#JC_TIMELIMIT_LONG="-We 59"
+JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_MERGE=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_NFILL=$JC_TIMELIMIT_LONG
@@ -78,7 +78,7 @@ fi
 $SDIR/bSync ${LSFTAG}_CFILL
 
 echo "vcf2MultiMAF::FILL2"
-bsub -m commonHG ${JC_TIMELIMIT} -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=22]" \
+bsub -m commonHG ${JC_TIMELIMIT_LONG} -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=22]" \
     $SDIR/vcf2MultiMAF_b37.sh ___FILLOUT.vcf
 
 $SDIR/bSync ${LSFTAG}_FILL2
