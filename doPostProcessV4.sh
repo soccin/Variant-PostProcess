@@ -21,6 +21,9 @@ LSFTAG=$(uuidgen)
 
 PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
 echo PROJECTNO=$PROJECTNO
+PAIRFILE=$PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+
+BEDGENOME=$SDIR/genomes/human.b37.genome
 
 ######################################################################
 #
@@ -28,12 +31,33 @@ echo PROJECTNO=$PROJECTNO
 # ignore events from haplotype caller
 #
 
+if [ "" ]; then
+echo "SKIP THIS" 
+exit
 bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ \
     -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
     $SDIR/getMergedMAFV4.sh \
         $PROJECTNO \
         $PIPELINEDIR \
-        $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+        $PAIRFILE
+fi
+
+######################################################################
+#
+# Recall INDELS with VarDict
+#
+# * First Get bed file with regions of putative INDELS (from haplotype)
+# * Then for all pairs
+#   * Run Somatic VarDict
+#   * Filter with DMP script
+#   * run vcf2maf
+# * Merge pairwise MAFs with MuTect MAF
+
+VOUT=_varDict
+mkdir -p $VOUT
+HAPMAF=$PIPELINEDIR/variants/snpsIndels/haplotypecaller/${PROJECTNO}_HaplotypeCaller.vcf
+
+$SDIR/getInDelRegionsFromVCF.sh $HAPMAF $BEDGENOME > $VOUT/indel.bed
 
 exit
 
