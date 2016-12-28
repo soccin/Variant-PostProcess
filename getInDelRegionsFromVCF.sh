@@ -1,0 +1,1 @@
+cat $HAPMAF | egrep -v "^#" | awk '{print $1,$2-1,$2,length($4),length($5),$4,$5}' | awk '$4>$5{print $1,$2,$3+$4} $5>$4{print $1,$2,$3+$5}' | tr ' ' '\t' | bedtools slop -b 250 -i - -g ~/lib/bedtools/genomes/human.b37.genome  | sort -k1,1V -k2,2n | bedtools merge -i - | awk '{print s+=($3-$2)/1e6}'
