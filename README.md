@@ -1,17 +1,22 @@
-# Variant-PostProcess (v3)
+# Variant-PostProcess (v4)
 
-## TERMINAL: This version does not work properly. 
+Second attempt to fix the problem with complex indel's in Haplotype caller. 
+This version fixes the problem by recalling with VarDict which does pairwise
+calling so there are no *extra* events. 
 
-* In/del's not left aligned always
+Flowchart:
 
-* Disagrees with VarDict; (see files in `testing`)
+* run BIC:variant_pipeline/haploTect_merge.pl on a _zero-ed_ out 
+haplotype VCF to get just the MuTect Events.
 
-This version fixes the problem with overlapping IN/DEL's in Haplotype VCF. It first fixes
-the Haplotype VCF and then uses the BIC post routines.
+* get locations of putative indels from haplotype (create bed) and 
+run VarDict on all pairs.
 
-* `FixMultiInDel/fixMultiInDel.sh`
+	* Post process VarDict vcf's with DMP filter_vardict
+	
+	* convert to maf's with vcf2maf
 
-* `variants_pipeline/haploTect_merge.pl`
+* Merge MAF's from MuTect and VarDict
 
-* FACETS_MERGE
+* do FACETS_MERGE
 
