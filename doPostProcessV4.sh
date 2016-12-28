@@ -7,8 +7,8 @@ SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-
 # Set small limit for debugging
 #
 JC_TIMELIMIT="-We 59"
-#JC_TIMELIMIT_LONG="-We 59"
-JC_TIMELIMIT_LONG=""
+JC_TIMELIMIT_LONG="-We 59"
+#JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_MERGE=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_NFILL=$JC_TIMELIMIT_LONG
@@ -24,15 +24,18 @@ echo PROJECTNO=$PROJECTNO
 
 ######################################################################
 #
-# Regenerate MergedMAF but first fix problem with overlapping in/del's
-# from haplotype caller
+# Regenerate MergedMAF but only for MuTect events 
+# ignore events from haplotype caller
 #
 
-bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
-$SDIR/getMergedMAF.sh \
-    $PROJECTNO \
-    $PIPELINEDIR \
-    $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ \
+    -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
+    $SDIR/getMergedMAFV4.sh \
+        $PROJECTNO \
+        $PIPELINEDIR \
+        $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+
+exit
 
 $SDIR/bSync ${LSFTAG}_MERGE
 BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt \

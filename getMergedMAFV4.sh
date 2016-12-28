@@ -23,10 +23,10 @@ fi
 ODIR=_mergedMAF
 mkdir -p $ODIR
 
-echo -n "fixing In/Dels..."
-$SDIR/FixMultiInDel/fixMultiInDel.sh \
-    $PIPELINEDIR/variants/snpsIndels/haplotypecaller/${PROJECTNO}_HaplotypeCaller.vcf \
-    $ODIR/___FixInDels.vcf
+echo -n "Create null haplotype VCF"
+    head -10000 \
+        $PIPELINEDIR/variants/snpsIndels/haplotypecaller/${PROJECTNO}_HaplotypeCaller.vcf \
+        | egrep "^#" > $ODIR/___NULLHaplotype.vcf
 
 echo "done"
 
@@ -40,7 +40,7 @@ $BICPIPEDIR/haploTect_merge.pl \
     -exac_vcf /opt/common/CentOS_6/vep/v86/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
     -output $ODIR \
     -mutect_dir $PIPELINEDIR/variants/snpsIndels/mutect \
-    -hc_vcf $ODIR/___FixInDels.vcf
+    -hc_vcf $ODIR/___NULLHaplotype.vcf
 
 echo "done"
 
