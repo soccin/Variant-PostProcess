@@ -14,7 +14,7 @@ PAD=250
 #
 
 cat $HAPMAF \
-	| egrep -v "^#" \
+	| egrep -v "^(#|GL|hs37)" \
 	| awk '{print $1,$2-1,$2,length($4),length($5)}' \
 	| awk '$4>$5{print $1,$2,$3+$4} $5>$4{print $1,$2,$3+$5}' \
 	| tr ' ' '\t' \
