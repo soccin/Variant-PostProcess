@@ -32,7 +32,7 @@ echo "done"
 
 echo -n "running haploTect_merge..."
 $BICPIPEDIR/haploTect_merge.pl \
-    -svnRev "GetMergedMAF.sh::$SVERSION" \
+    -svnRev "GetMergedMAFV4.sh::$SVERSION" \
     -config $BICPIPEDIR/variants_pipeline_config.txt \
     -pre $PROJECTNO \
     -pair $PAIRINGFILE \
