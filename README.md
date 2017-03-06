@@ -1,8 +1,10 @@
 # Variant-PostProcess (v3)
 
-## TERMINAL: This version does not work properly. 
+## This version does not work properly.
 
-* In/del's not left aligned always
+But for now this is the best solution so currently being used in production.
+
+* (FIXED by KK) In/del's not left aligned always
 
 * Disagrees with VarDict; (see files in `testing`)
 
