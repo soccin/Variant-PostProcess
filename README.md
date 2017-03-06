@@ -1,10 +1,16 @@
 # Variant-PostProcess (v3)
 
-## TERMINAL: This version does not work properly. 
+## This version does not work properly.
+
+But for now this is the best solution so currently being used in production.
+
+* Disagrees with VarDict; (see files in `testing`)
+
+This problem
 
 * In/del's not left aligned always
 
-* Disagrees with VarDict; (see files in `testing`)
+has been fixed (KK in FixMultiIndel)
 
 This version fixes the problem with overlapping IN/DEL's in Haplotype VCF. It first fixes
 the Haplotype VCF and then uses the BIC post routines.
