@@ -12,6 +12,7 @@ JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_MERGE=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_NFILL=$JC_TIMELIMIT_LONG
+JC_TIMELIMIT_MAFANNO=$JC_TIMELIMIT_LONG
 
 FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
 
@@ -169,7 +170,7 @@ cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
 
-bsub -m commonHG ${JC_TIMELIMIT} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
+bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
 $FACETS_SUITE/facets mafAnno \
     -m ${PROJECTNO}___SOMATIC.vep.filtered.V3.maf\
     -f _facets_mapping_fixed.txt \
