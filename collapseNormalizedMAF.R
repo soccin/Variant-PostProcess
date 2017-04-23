@@ -11,7 +11,7 @@ getMAFHeader<-function(fname){
     colNameRow=grep("^Hugo_Symbol",header)
     if(len(colNameRow)==0){
         cat("\n\nFATAL ERROR: INVALID MAF HEADER\n\n")
-        stop("collapseNormalizedMAF.R::L-9")
+        stop("collapseNormalizedMAF.R::L-14")
     }
 
     return(header[1:(colNameRow-1)])
@@ -30,22 +30,22 @@ cArgs=commandArgs(trailing=T)
 #
 
 # Set defaults first
-
-args=list(MAFFILE=NULL,RevisionTAG="unknown")
+args=list(IN=NULL,RevisionTAG="unknown",OUT=NULL)
 parseArgs=str_match(cArgs,"(.*)=(.*)")
 dummy=apply(parseArgs,1,function(x){args[[str_trim(x[2])]]<<-str_trim(x[3])})
 
-if(is.null(args$MAFFILE)) {
-    cat("\n\tusage: collapseNormalizedMAF.R MAFFILE=MAFFILE\n\n")
+if(is.null(args$IN)) {
+    cat("\n\tusage: collapseNormalizedMAF.R IN=input.maf [OUT=output.maf]\n")
+    cat("\t  default OUT=input_PPv5.txt\n\n")
     quit()
 }
 
 require(data.table)
 
-mafHeader=getMAFHeader(args$MAFFILE)
+mafHeader=getMAFHeader(args$IN)
 
 TCGA_COLS=1:34
-maf=fread(args$MAFFILE)
+maf=fread(args$IN)
 
 #
 # Get rid of any column that is
@@ -77,7 +77,11 @@ mafC[
 reorder=order(factor(mafC$Chromosome,levels=c(1:22,"X","Y","M","MT")),mafC$Start_Position)
 mafC=mafC[reorder,]
 
-OUTMAFFILE=gsub(".txt$","_PPv5.txt",args$MAFFILE)
+if(is.null(args$OUT)) {
+    OUTMAFFILE=gsub("(.maf|.txt)$","_collapse.txt",args$IN)
+} else {
+    OUTMAFFILE=args$OUT
+}
 
 write(mafHeader,OUTMAFFILE)
 versionString=paste0("#Variant-PostProcess:collapseNormalizedMAF:Version[",args$RevisionTAG,"]")
