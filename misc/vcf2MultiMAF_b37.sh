@@ -2,12 +2,13 @@
 
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
+VARIANTSPIPEDIR=/home/socci/Code/Pipelines/CBE/Variant/variants_pipeline
 BEDTOOLS=/opt/common/CentOS_6/bedtools/bedtools-2.22.0/bin/bedtools
+VEPPATH=/opt/common/CentOS_6/vep/v83
+#VEPPATH=/scratch/socci/v83
 PERL=/opt/common/CentOS_6-dev/perl/perl-5.22.0/bin/perl
 PYTHON=/opt/common/CentOS_6-dev/bin/current/python
-
-VEPPATH=/opt/common/CentOS_6/vep/v86
-VCF2MAF=/opt/common/CentOS_6/vcf2maf/v1.6.11
+VCF2MAF=/opt/common/CentOS_6/vcf2maf/v1.6.6
 MSK_ISOFORMS=$VCF2MAF/data/isoform_overrides_at_mskcc
 
 ln -s /ifs/depot/assemblies/H.sapiens/b37/b37.fasta
@@ -30,7 +31,6 @@ for si in $SAMPS; do
         --vep-data $VEPPATH \
         --ref-fasta $GENOME \
         --custom-enst $MSK_ISOFORMS \
-        --filter-vcf $VEPPATH/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
         --tumor-id $si \
         --output-maf split___${BASE}___${si}___FILLOUT.maf
 

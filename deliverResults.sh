@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "NEED TO FIX THIS FOR V3"
+exit
+
 if [ ! -e ../config ]; then
     echo "You are in the wrong directory, need to be in post directory"
     echo "can not find config file [../config]"
