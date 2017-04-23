@@ -1,15 +1,14 @@
-# Variant-PostProcess (v3)
+# Variant-PostProcess (v5)
 
-This version does not work properly. But for now this is the best solution so currently being used in production.
+## Strictly Post MAF version
 
-* Disagrees with VarDict; (see files in `testing`)
+This version assumes the input MAF is a properly merged MAF with all events present (all rows are present) and intact. PostProcess V5 will _only add_ columns to the MAF that either
 
-This version fixes the problem with overlapping IN/DEL's in Haplotype VCF. It first fixes
-the Haplotype VCF and then uses the BIC post routines.
+* Add annotation
 
-* `FixMultiInDel/fixMultiInDel.sh`
+* Add filtering flags (which are kind of annotation)
 
-* `variants_pipeline/haploTect_merge.pl`
+* Join other info: like facets (really more annotation)
 
-* FACETS_MERGE
+Columns may be removed but this is highly undesirable and should be avoided if possible. 
 
