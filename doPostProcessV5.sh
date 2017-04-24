@@ -68,7 +68,7 @@ bsub -m commonHG ${JC_TIMELIMIT_LONG} -o LSF.02.FILL2VCF/ \
 #
 
 $SDIR/addHeaderTags.R IN=$MERGEDMAF OUT=post_01.maf RevisionTAG=$SVERSION
-$SDIR/collapseNormalizedMAF.R IN=post_01.maf OUT=${PROJECTNO}_haplotect_VEP_MAF__PostV5.txt
+$SDIR/collapseNormalizedMAF.R IN=post_01.maf OUT=${PROJECTNO}_haplotect_VEP_MAF__PostV5.txt RevisionTAG=$SVERSION
 
 $SDIR/bSync ${LSFTAG}_FILL2
 cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V5.txt
