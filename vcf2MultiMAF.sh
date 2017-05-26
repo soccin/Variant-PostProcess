@@ -38,6 +38,13 @@ SAMPS=$(cat $VCF | fgrep "#CHROM" | cut -f10- | tr '\t' ' ')
 
 BASE=$(basename $VCF | sed 's/.vcf//')
 
+echo "***********************************************************"
+echo
+echo "THIS IS BROKEN; DOES NOT WORK FOR MOUSE"
+echo
+echo
+exit -1
+
 for si in $SAMPS; do
     echo ${BASE}___${si}
 
@@ -46,6 +53,13 @@ for si in $SAMPS; do
         --input-vcf $VCF \
         --vep-path $VEPPATH \
         --vep-data $VEPPATH \
+###
+###
+exit
+
+# remove this for mouse
+
+
         --filter-vcf $VEPPATH/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
         --ref-fasta $GENOME \
         --tumor-id $si \
