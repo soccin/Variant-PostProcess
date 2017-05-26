@@ -48,19 +48,19 @@ else
     ln -s $MERGEDMAF preFillMAF.txt
 fi
 
-if [ ! -e ___FILLOUT.vcf ]; then
-echo "fillOutCBE::CFILL"
-    bsub -m commonHG ${JC_TIMELIMIT_CFILL} -o LSF.01.FILLOUT/ \
-      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
-        ~/Code/FillOut/FillOut/fillOutCBE.sh \
-          $BAMDIR preFillMAF.txt ___FILLOUT.vcf
-fi
+# if [ ! -e ___FILLOUT.vcf ]; then
+# echo "fillOutCBE::CFILL"
+#     bsub -m commonHG ${JC_TIMELIMIT_CFILL} -o LSF.01.FILLOUT/ \
+#       -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
+#         ~/Code/FillOut/FillOut/fillOutCBE.sh \
+#           $BAMDIR preFillMAF.txt ___FILLOUT.vcf
+# fi
 
-echo "vcf2MultiMAF::FILL2"
-bsub -m commonHG ${JC_TIMELIMIT_LONG} -o LSF.02.FILL2VCF/ \
-    -J ${LSFTAG}_FILL2 -w "post_done(${LSFTAG}_CFILL)" \
-    -n 12 -R "rusage[mem=22]" \
-    $SDIR/vcf2MultiMAF.sh ___FILLOUT.vcf $BAM_GENOME
+# echo "vcf2MultiMAF::FILL2"
+# bsub -m commonHG ${JC_TIMELIMIT_LONG} -o LSF.02.FILL2VCF/ \
+#     -J ${LSFTAG}_FILL2 -w "post_done(${LSFTAG}_CFILL)" \
+#     -n 12 -R "rusage[mem=22]" \
+#     $SDIR/vcf2MultiMAF.sh ___FILLOUT.vcf $BAM_GENOME
 
 
 #######
@@ -70,6 +70,6 @@ bsub -m commonHG ${JC_TIMELIMIT_LONG} -o LSF.02.FILL2VCF/ \
 $SDIR/addHeaderTags.R IN=$MERGEDMAF OUT=post_01.maf RevisionTAG=$SVERSION
 $SDIR/collapseNormalizedMAF.R IN=post_01.maf OUT=${PROJECTNO}_haplotect_VEP_MAF__PostV5.txt RevisionTAG=$SVERSION
 
-$SDIR/bSync ${LSFTAG}_FILL2
-cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V5.txt
+#$SDIR/bSync ${LSFTAG}_FILL2
+#cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V5.txt
 
