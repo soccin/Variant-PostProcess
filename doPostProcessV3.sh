@@ -53,7 +53,7 @@ $SDIR/getMergedMAF.sh \
     $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
 
 $SDIR/bSync ${LSFTAG}_MERGE
-BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt \
+BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt
 
 #
 # Do wes-filters
