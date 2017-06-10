@@ -16,7 +16,24 @@ JC_TIMELIMIT_MAFANNO=$JC_TIMELIMIT_LONG
 
 FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
 
+WESFBIN=$SDIR/wes-filters
+NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
+FFPEPOOLDIR=/ifs/res/share/pwg/FFPEPool/Case_201601/Proj_06049_Pool/r_001
+FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
+
+if [ ! -e $NORMALCOHORTBAMS ]; then
+    echo -e "\n\nERROR: Missing the normal cohort BAMS\n\n"
+    exit 1
+fi
+
+if [ ! -e $FFPEPOOLBAM ]; then
+    echo -e "\n\nERROR: Missing the FFPE POOL BAM"
+    exit 1
+fi
+
 . ../config
+
+BAMDIR=$PIPELINEDIR/alignments
 
 LSFTAG=$(uuidgen)
 
@@ -42,12 +59,6 @@ BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt \
 # Do wes-filters
 #
 
-BAMDIR=$PIPELINEDIR/alignments
-WESFBIN=$SDIR/wes-filters
-NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
-FFPEPOOLDIR=/ifs/res/share/soccin/Case_201601/Proj_06049_Pool/r_001
-FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
-
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
     bsub -m commonHG ${JC_TIMELIMIT} -n 24 -o LSF/ \
@@ -63,7 +74,7 @@ echo "maf_fillout.py::NFILL"
     bsub -m commonHG ${JC_TIMELIMIT_NFILL} -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" -R "rusage[mem=24]" \
         $WESFBIN/maf_fillout.py -n 24 -g b37 \
         -m $BICMAF -o normalCohortFill.out \
-        -b $(ls /ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA/*.bam)
+        -b $(ls $NORMALCOHORTBAMS/*.bam)
 fi
 
 if [ ! -e ___FILLOUT.vcf ]; then
