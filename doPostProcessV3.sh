@@ -40,6 +40,18 @@ LSFTAG=$(uuidgen)
 PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
 echo PROJECTNO=$PROJECTNO
 
+echo "Check BIC MAF post indel bug"
+BICMAF=$PIPELINEDIR/variants/snpsIndels/haplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
+SVNREV=$(head $BICMAF | fgrep SVN | awk '{print $3}')
+echo "MAF SVN REV = $SVNREV"
+if [ "$SVNREV" -lt "5520" ]; then
+    echo -e "\n\n    BICMAF may have in/del bug SVNREV < 5520\n\n"
+    exit -1
+fi
+echo "Use BIC maf"
+echo $BICMAF
+
+
 # ######################################################################
 # #
 # # Regenerate MergedMAF but first fix problem with overlapping in/del's
@@ -55,9 +67,6 @@ echo PROJECTNO=$PROJECTNO
 # $SDIR/bSync ${LSFTAG}_MERGE
 # BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt
 
-echo "Use BIC maf"
-BICMAF=$PIPELINEDIR/variants/snpsIndels/haplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
-echo $BICMAF
 
 if [ ! -e $BICMAF ]; then
     echo -e "\n\nCan not find BIC MAF"
