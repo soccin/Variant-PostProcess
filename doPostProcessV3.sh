@@ -40,20 +40,29 @@ LSFTAG=$(uuidgen)
 PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
 echo PROJECTNO=$PROJECTNO
 
-######################################################################
-#
-# Regenerate MergedMAF but first fix problem with overlapping in/del's
-# from haplotype caller
-#
+# ######################################################################
+# #
+# # Regenerate MergedMAF but first fix problem with overlapping in/del's
+# # from haplotype caller
+# #
 
-bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
-$SDIR/getMergedMAF.sh \
-    $PROJECTNO \
-    $PIPELINEDIR \
-    $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+# bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
+# $SDIR/getMergedMAF.sh \
+#     $PROJECTNO \
+#     $PIPELINEDIR \
+#     $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
 
-$SDIR/bSync ${LSFTAG}_MERGE
-BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt
+# $SDIR/bSync ${LSFTAG}_MERGE
+# BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt
+
+echo "Use BIC maf"
+BICMAF=$PIPELINEDIR/variants/snpsIndels/haplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
+echo $BICMAF
+
+if [ ! -e $BICMAF ]; then
+    echo -e "\n\nCan not find BIC MAF"
+    exit 1
+fi
 
 #
 # Do wes-filters
