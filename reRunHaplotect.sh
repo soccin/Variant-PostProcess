@@ -20,7 +20,7 @@ else
     GENOME=b37
 fi
 
-ODIR=_mergedMAF
+ODIR=_reRunHaplotect
 mkdir -p $ODIR
 
 echo -n "running haploTect_merge..."
