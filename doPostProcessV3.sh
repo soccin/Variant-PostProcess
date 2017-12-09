@@ -3,6 +3,8 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
+export R_LIBS=""
+
 #
 # Set small limit for debugging
 #
