@@ -42,32 +42,35 @@ LSFTAG=$(uuidgen)
 PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
 echo PROJECTNO=$PROJECTNO
 
-echo "Check BIC MAF post indel bug"
+echo "Check BIC MAF version"
 BICMAF=$PIPELINEDIR/variants/snpsIndels/haplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
 SVNREV=$(head $BICMAF | fgrep SVN | awk '{print $3}')
 echo "MAF SVN REV = $SVNREV"
-if [ "$SVNREV" -lt "5520" ]; then
-    echo -e "\n\n    BICMAF may have in/del bug SVNREV < 5520\n\n"
-    exit -1
+if [ "$SVNREV" -lt "5700" ]; then
+    echo -e "\n\n    BICMAF prior to 5699 fix (mutect filter bug)\n"
+    echo -e "    Rerunning later haplotect\n\n"
+
+    ######################################################################
+    #
+    # Regenerate HaplotectMAF with later version of pipeline code
+    #
+
+    bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
+    $SDIR/reRunHaplotect.sh \
+        $PROJECTNO \
+        $PIPELINEDIR \
+        $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+
+    $SDIR/bSync ${LSFTAG}_MERGE
+    BICMAF=_reRunHaplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
+
+
+else
+    echo "Use BIC maf"
+    echo $BICMAF
 fi
-echo "Use BIC maf"
-echo $BICMAF
 
 
-# ######################################################################
-# #
-# # Regenerate MergedMAF but first fix problem with overlapping in/del's
-# # from haplotype caller
-# #
-
-# bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
-# $SDIR/getMergedMAF.sh \
-#     $PROJECTNO \
-#     $PIPELINEDIR \
-#     $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
-
-# $SDIR/bSync ${LSFTAG}_MERGE
-# BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt
 
 
 if [ ! -e $BICMAF ]; then
