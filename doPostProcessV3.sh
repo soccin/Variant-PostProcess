@@ -71,8 +71,6 @@ else
 fi
 
 
-
-
 if [ ! -e $BICMAF ]; then
     echo -e "\n\nCan not find BIC MAF"
     exit 1
@@ -192,9 +190,9 @@ fi
 # Get rid of GL chromosomes
 #
 
-cat mafFinal | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___SOMATIC.vep.filtered.V3.maf
+cat mafFinal | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf
 
-cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V3.maf
+cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V3b.maf
 
 ###################################################################################
 # Add facets
@@ -206,9 +204,9 @@ cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
 
 bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
 $FACETS_SUITE/facets mafAnno \
-    -m ${PROJECTNO}___SOMATIC.vep.filtered.V3.maf\
+    -m ${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf\
     -f _facets_mapping_fixed.txt \
-    -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3.maf
+    -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3b.maf
 
 EXIT=$?
 
