@@ -198,6 +198,8 @@ cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V
 # Add facets
 #
 
+export PATH=/opt/common/CentOS_6-dev/R/R-3.3.1/bin:$PATH
+
 cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
