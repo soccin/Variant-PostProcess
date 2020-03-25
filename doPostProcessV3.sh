@@ -46,6 +46,11 @@ echo "Check BIC MAF version"
 BICMAF=$PIPELINEDIR/variants/snpsIndels/haplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
 SVNREV=$(head $BICMAF | fgrep SVN | awk '{print $3}')
 echo "MAF SVN REV = $SVNREV"
+if [ "$SVNREV" == "" ]; then
+    echo -e "\n\n No SVN TAG, setting version to 0"
+    SVNREV=0
+fi
+
 if [ "$SVNREV" -lt "5700" ]; then
     echo -e "\n\n    BICMAF prior to 5699 fix (mutect filter bug)\n"
     echo -e "    Rerunning later haplotect\n\n"
@@ -101,7 +106,7 @@ fi
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
     bsub -m commonHG ${JC_TIMELIMIT_CFILL} -o LSF/ \
-      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
+      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=128]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $BICMAF \
@@ -204,7 +209,7 @@ cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
 
-bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
+bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=40]" -M 41 \
 $FACETS_SUITE/facets mafAnno \
     -m ${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf\
     -f _facets_mapping_fixed.txt \
