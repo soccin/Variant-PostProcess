@@ -7,9 +7,9 @@ export R_LIBS=""
 
 #
 # Set small limit for debugging
-#
-JC_TIMELIMIT="-We 59"
-#JC_TIMELIMIT_LONG="-We 59"
+# -W option no longer used on LUNA
+JC_TIMELIMIT=""
+#JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_MERGE=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
