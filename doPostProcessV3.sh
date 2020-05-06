@@ -3,11 +3,13 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
+export R_LIBS=""
+
 #
 # Set small limit for debugging
-#
-JC_TIMELIMIT="-We 59"
-#JC_TIMELIMIT_LONG="-We 59"
+# -W option no longer used on LUNA
+JC_TIMELIMIT=""
+#JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_LONG=""
 JC_TIMELIMIT_MERGE=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
@@ -16,37 +18,72 @@ JC_TIMELIMIT_MAFANNO=$JC_TIMELIMIT_LONG
 
 FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
 
+WESFBIN=$SDIR/wes-filters
+NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
+FFPEPOOLDIR=/ifs/res/share/pwg/FFPEPool/Case_201601/Proj_06049_Pool/r_001
+FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
+
+if [ ! -e $NORMALCOHORTBAMS ]; then
+    echo -e "\n\nERROR: Missing the normal cohort BAMS\n\n"
+    exit 1
+fi
+
+if [ ! -e $FFPEPOOLBAM ]; then
+    echo -e "\n\nERROR: Missing the FFPE POOL BAM"
+    exit 1
+fi
+
 . ../config
+
+BAMDIR=$PIPELINEDIR/alignments
 
 LSFTAG=$(uuidgen)
 
 PROJECTNO=$(echo $PROJECTDIR | perl -ne 'm|(Proj_[^/]*)|; print $1')
 echo PROJECTNO=$PROJECTNO
 
-######################################################################
-#
-# Regenerate MergedMAF but first fix problem with overlapping in/del's
-# from haplotype caller
-#
+echo "Check BIC MAF version"
+BICMAF=$PIPELINEDIR/variants/snpsIndels/haplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
+SVNREV=$(head $BICMAF | fgrep SVN | awk '{print $3}')
+echo "MAF SVN REV = $SVNREV"
+if [ "$SVNREV" == "" ]; then
+    echo -e "\n\n No SVN TAG, setting version to 0"
+    SVNREV=0
+fi
 
-bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
-$SDIR/getMergedMAF.sh \
-    $PROJECTNO \
-    $PIPELINEDIR \
-    $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+if [ "$SVNREV" -lt "5700" ]; then
+    echo -e "\n\n    BICMAF prior to 5699 fix (mutect filter bug)\n"
+    echo -e "    Rerunning later haplotect\n\n"
 
-$SDIR/bSync ${LSFTAG}_MERGE
-BICMAF=_mergedMAF/${PROJECTNO}_haplotect_VEP_MAF.txt \
+    ######################################################################
+    #
+    # Regenerate HaplotectMAF with later version of pipeline code
+    #
+
+    bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
+    $SDIR/reRunHaplotect.sh \
+        $PROJECTNO \
+        $PIPELINEDIR \
+        $PROJECTDIR/${PROJECTNO}_sample_pairing.txt
+
+    $SDIR/bSync ${LSFTAG}_MERGE
+    BICMAF=_reRunHaplotect/${PROJECTNO}_haplotect_VEP_MAF.txt
+
+
+else
+    echo "Use BIC maf"
+    echo $BICMAF
+fi
+
+
+if [ ! -e $BICMAF ]; then
+    echo -e "\n\nCan not find BIC MAF"
+    exit 1
+fi
 
 #
 # Do wes-filters
 #
-
-BAMDIR=$PIPELINEDIR/alignments
-WESFBIN=$SDIR/wes-filters
-NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
-FFPEPOOLDIR=/ifs/res/share/soccin/Case_201601/Proj_06049_Pool/r_001
-FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
@@ -63,13 +100,13 @@ echo "maf_fillout.py::NFILL"
     bsub -m commonHG ${JC_TIMELIMIT_NFILL} -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" -R "rusage[mem=24]" \
         $WESFBIN/maf_fillout.py -n 24 -g b37 \
         -m $BICMAF -o normalCohortFill.out \
-        -b $(ls /ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA/*.bam)
+        -b $(ls $NORMALCOHORTBAMS/*.bam)
 fi
 
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
     bsub -m commonHG ${JC_TIMELIMIT_CFILL} -o LSF/ \
-      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=22]" \
+      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=128]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $BICMAF \
@@ -158,23 +195,25 @@ fi
 # Get rid of GL chromosomes
 #
 
-cat mafFinal | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___SOMATIC.vep.filtered.V3.maf
+cat mafFinal | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf
 
-cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V3.maf
+cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V3b.maf
 
 ###################################################################################
 # Add facets
 #
 
+export PATH=/opt/common/CentOS_6-dev/R/R-3.3.1/bin:$PATH
+
 cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
 
-bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=20]" -M 21 \
+bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=40]" -M 41 \
 $FACETS_SUITE/facets mafAnno \
-    -m ${PROJECTNO}___SOMATIC.vep.filtered.V3.maf\
+    -m ${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf\
     -f _facets_mapping_fixed.txt \
-    -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3.maf
+    -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3b.maf
 
 EXIT=$?
 
