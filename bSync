@@ -12,7 +12,7 @@ getLastJobNo() {
 HOLDJOB=$(getLastJobNo)
 while [ "$HOLDJOB" != "" ]; do
     echo "JOB =" $JOBNAME "holding on jid =" $HOLDJOB
-    $LSFBIN/bsub -We 1 -w "post_done($HOLDJOB)" -J bSync_${JOBNAME}_$$ -K echo "$JOBNAME"
+    $LSFBIN/bsub -w "post_done($HOLDJOB)" -J bSync_${JOBNAME}_$$ -K echo "$JOBNAME"
     sleep 3
     HOLDJOB=$(getLastJobNo)
 done
