@@ -59,7 +59,7 @@ if [ "$SVNREV" -lt "5700" ]; then
     # Regenerate HaplotectMAF with later version of pipeline code
     #
 
-    bsub -m commonHG ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" -M 21 \
+    bsub ${JC_TIMELIMIT_MERGE} -o LSF.MERGE/ -J ${LSFTAG}_MERGE -R "rusage[mem=20]" \
     $SDIR/reRunHaplotect.sh \
         $PROJECTNO \
         $PIPELINEDIR \
@@ -86,8 +86,8 @@ fi
 
 if [ ! -e ffpePoolFill.out ]; then
 echo "maf_fillout.py::FFILL"
-    bsub -m commonHG ${JC_TIMELIMIT} -n 24 -o LSF/ \
-	-J ${LSFTAG}_FFILL -R "rusage[mem=24]" \
+    bsub ${JC_TIMELIMIT} -n 24 -o LSF/ \
+	-J ${LSFTAG}_FFILL -R "rusage[mem=1]" \
          $WESFBIN/maf_fillout.py -n 24 -g b37 \
          -m $BICMAF \
          -o ffpePoolFill.out \
@@ -96,7 +96,7 @@ fi
 
 if [ ! -e normalCohortFill.out ]; then
 echo "maf_fillout.py::NFILL"
-    bsub -m commonHG ${JC_TIMELIMIT_NFILL} -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" -R "rusage[mem=24]" \
+    bsub  ${JC_TIMELIMIT_NFILL} -n 24 -o LSF/ -J ${LSFTAG}_NFILL -w "post_done(${LSFTAG}_FFILL)" -R "rusage[mem=1]" \
         $WESFBIN/maf_fillout.py -n 24 -g b37 \
         -m $BICMAF -o normalCohortFill.out \
         -b $(ls $NORMALCOHORTBAMS/*.bam)
@@ -104,8 +104,8 @@ fi
 
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
-    bsub -m commonHG ${JC_TIMELIMIT_CFILL} -o LSF/ \
-      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=128]" \
+    bsub  ${JC_TIMELIMIT_CFILL} -o LSF/ \
+      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=6]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $BICMAF \
@@ -115,7 +115,7 @@ fi
 $SDIR/bSync ${LSFTAG}_CFILL
 
 echo "vcf2MultiMAF::FILL2"
-bsub -m commonHG ${JC_TIMELIMIT_LONG} -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=22]" \
+bsub  ${JC_TIMELIMIT_LONG} -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=2]" \
     $SDIR/vcf2MultiMAF_b37.sh ___FILLOUT.vcf
 
 $SDIR/bSync ${LSFTAG}_FILL2
@@ -203,12 +203,13 @@ cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V
 #
 
 export PATH=/opt/common/CentOS_6-dev/R/R-3.3.1/bin:$PATH
+export R_LIBS=$HOME/lib/R/3.3.1
 
 cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
 
-bsub -m commonHG ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=40]" -M 41 \
+bsub  ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=40]" \
 $FACETS_SUITE/facets mafAnno \
     -m ${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf\
     -f _facets_mapping_fixed.txt \
