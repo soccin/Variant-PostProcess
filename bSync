@@ -9,10 +9,12 @@ getLastJobNo() {
         | tail -1 | perl -ne '/Job <(\d+)>/;print "$1\n"'
 }
 
+JC_TIMELIMIT="-W 1"
+
 HOLDJOB=$(getLastJobNo)
 while [ "$HOLDJOB" != "" ]; do
     echo "JOB =" $JOBNAME "holding on jid =" $HOLDJOB
-    $LSFBIN/bsub -w "post_done($HOLDJOB)" -J bSync_${JOBNAME}_$$ -K echo "$JOBNAME"
+    $LSFBIN/bsub $JC_TIMELIMIT -w "post_done($HOLDJOB)" -J bSync_${JOBNAME}_$$ -K echo "$JOBNAME"
     sleep 3
     HOLDJOB=$(getLastJobNo)
 done
