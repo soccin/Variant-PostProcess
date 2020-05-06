@@ -3,7 +3,15 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
-export R_LIBS=""
+echo "NEED TO FIX R STUFF FOR JUNO"
+exit 1
+
+#export PATH=/opt/common/CentOS_6-dev/R/R-3.3.1/bin:$PATH
+#export R_LIBS=$HOME/lib/R/3.3.1
+#export R_LIBS=""
+
+export PATH=:$PATH
+export R_LIBS=/home/socci/lib/R/3.3.1
 
 #
 # Set small limit for debugging
@@ -201,9 +209,6 @@ cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V
 ###################################################################################
 # Add facets
 #
-
-export PATH=/opt/common/CentOS_6-dev/R/R-3.3.1/bin:$PATH
-export R_LIBS=$HOME/lib/R/3.3.1
 
 cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
