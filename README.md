@@ -1,6 +1,6 @@
 # Variant-PostProcess (v3)
 
-## FINAL LUNA Version (removed -We args to deal with final config)
+## First JUNO Version (2020-05-05)
 
 This version does not work properly. But for now this is the best solution so currently being used in production.
 
