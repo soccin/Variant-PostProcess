@@ -3,15 +3,8 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
-echo "NEED TO FIX R STUFF FOR JUNO"
-exit 1
-
-#export PATH=/opt/common/CentOS_6-dev/R/R-3.3.1/bin:$PATH
-#export R_LIBS=$HOME/lib/R/3.3.1
-#export R_LIBS=""
-
-export PATH=:$PATH
-export R_LIBS=/home/socci/lib/R/3.3.1
+export PATH=$SDIR/opt/bin:$PATH
+#export R_LIBS="$SDIR/opt/local/lib"
 
 #
 # Set small limit for debugging
@@ -113,7 +106,7 @@ fi
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
     bsub  ${JC_TIMELIMIT_CFILL} -o LSF/ \
-      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=6]" \
+      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=4]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $BICMAF \
