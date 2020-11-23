@@ -1,6 +1,6 @@
 # Variant-PostProcess (v3)
 
-## First JUNO Version (2020-05-05)
+## JUNO Version (2020-11-22)
 
 This version does not work properly. But for now this is the best solution so currently being used in production.
 
