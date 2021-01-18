@@ -10,8 +10,8 @@ VEPPATH=/opt/common/CentOS_6/vep/v86
 VCF2MAF=/opt/common/CentOS_6/vcf2maf/v1.6.11
 MSK_ISOFORMS=$VCF2MAF/data/isoform_overrides_at_mskcc
 
-ln -s /ifs/depot/assemblies/H.sapiens/b37/b37.fasta
-ln -s /ifs/depot/assemblies/H.sapiens/b37/b37.fasta.fai
+ln -s /juno/depot/assemblies/H.sapiens/b37/b37.fasta
+ln -s /juno/depot/assemblies/H.sapiens/b37/b37.fasta.fai
 GENOME=b37.fasta
 
 VCF=$1
