@@ -4,7 +4,7 @@ SDIR="$( cd "$( dirname "$0" )" && pwd )"
 SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-UNCOMMITED")
 
 export PATH=$SDIR/opt/bin:$PATH
-#export R_LIBS="$SDIR/opt/local/lib"
+unset R_LIBS
 
 #
 # Set small limit for debugging
