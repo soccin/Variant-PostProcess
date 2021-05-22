@@ -20,20 +20,25 @@ SAMPS=$(cat $VCF | fgrep "#CHROM" | cut -f10- | tr '\t' ' ')
 
 BASE=$(basename $VCF | sed 's/.vcf//')
 
+LSFTAG=vcf2multimaf__$(uuidgen)
+
 for si in $SAMPS; do
     echo ${BASE}___${si}
-
-    $PERL $VCF2MAF/vcf2maf.pl \
-        --vep-forks 12 \
-        --input-vcf $VCF \
-        --vep-path $VEPPATH \
-        --vep-data $VEPPATH \
-        --ref-fasta $GENOME \
-        --custom-enst $MSK_ISOFORMS \
-        --filter-vcf $VEPPATH/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
-        --tumor-id $si \
-        --output-maf split___${BASE}___${si}___FILLOUT.maf
+    cp $VCF temp__${BASE}___${si}___${VCF}
+    bsub -W 59 -o LSF.VCF2MULTI/ -J $LSFTAG -n 24 -R "rusage[mem=1]" \
+        $PERL $VCF2MAF/vcf2maf.pl \
+            --vep-forks 24 \
+            --input-vcf temp__${BASE}___${si}___${VCF} \
+            --vep-path $VEPPATH \
+            --vep-data $VEPPATH \
+            --ref-fasta $GENOME \
+            --custom-enst $MSK_ISOFORMS \
+            --filter-vcf $VEPPATH/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz \
+            --tumor-id $si \
+            --output-maf split___${BASE}___${si}___FILLOUT.maf
 
 done
+
+$SDIR/bSync $LSFTAG
 
 (cat $SDIR/_MAF_HEADER ; egrep -hv "(^#|^Hugo)" split___${BASE}___*) > ${BASE}.maf
