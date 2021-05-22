@@ -19,8 +19,10 @@ JC_TIMELIMIT_MAFANNO=$JC_TIMELIMIT_LONG
 FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
 
 WESFBIN=$SDIR/wes-filters
-NORMALCOHORTBAMS=/ifs/res/share/pwg/NormalCohort/SetA/CuratedBAMsSetA
-FFPEPOOLDIR=/ifs/res/share/pwg/FFPEPool/Case_201601/Proj_06049_Pool/r_001
+#POSTRESDIR=/ifs/res/share/pwg/
+POSTRESDIR=/juno/res/bic/shared/pwg
+NORMALCOHORTBAMS=$POSTRESDIR/NormalCohort/SetA/CuratedBAMsSetA
+FFPEPOOLDIR=$POSTRESDIR/FFPEPool/Case_201601/Proj_06049_Pool/r_001
 FFPEPOOLBAM=$FFPEPOOLDIR/alignments/Proj_06049_Pool_indelRealigned_recal_s_UD_ffpepool1_N.bam
 
 if [ ! -e $NORMALCOHORTBAMS ]; then
@@ -106,7 +108,7 @@ fi
 if [ ! -e ___FILLOUT.vcf ]; then
 echo "fillOutCBE::CFILL"
     bsub  ${JC_TIMELIMIT_CFILL} -o LSF/ \
-      -J ${LSFTAG}_CFILL -n 24 -R "rusage[mem=4]" \
+      -J ${LSFTAG}_CFILL -n 48 -R "rusage[mem=3]" \
         ~/Code/FillOut/FillOut/fillOutCBE.sh \
         $BAMDIR \
         $BICMAF \
@@ -116,7 +118,8 @@ fi
 $SDIR/bSync ${LSFTAG}_CFILL
 
 echo "vcf2MultiMAF::FILL2"
-bsub  ${JC_TIMELIMIT_LONG} -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=2]" \
+#bsub  ${JC_TIMELIMIT_LONG} -o LSF/ -J ${LSFTAG}_FILL2 -n 12 -R "rusage[mem=2]" \
+bsub  ${JC_TIMELIMIT_LONG} -o LSF/ -J ${LSFTAG}_FILL2 \
     $SDIR/vcf2MultiMAF_b37.sh ___FILLOUT.vcf
 
 $SDIR/bSync ${LSFTAG}_FILL2
