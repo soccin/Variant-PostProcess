@@ -6,10 +6,6 @@ SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-
 export PATH=$SDIR/opt/bin:$PATH
 unset R_LIBS
 
-bsub () {
-    echo bsub $*
-}
-
 echo ""
 echo "   LSF_ENV_ARGS=\"$LSF_ENV_ARGS\""
 echo ""
