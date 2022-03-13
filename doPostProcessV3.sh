@@ -6,11 +6,19 @@ SVERSION=$(git --git-dir=$SDIR/.git --work-tree=$SDIR describe --tags --dirty="-
 export PATH=$SDIR/opt/bin:$PATH
 unset R_LIBS
 
+bsub () {
+    echo bsub $*
+}
+
+echo ""
+echo "   LSF_ENV_ARGS=\"$LSF_ENV_ARGS\""
+echo ""
+
 #
 # Set small limit for debugging
 # -W option no longer used on LUNA
-JC_TIMELIMIT="-W 59 -sla CMOGPU"
-JC_TIMELIMIT_LONG="-W 359 -sla CMOGPU"
+JC_TIMELIMIT="-W 59 $LSF_ENV_ARGS"
+JC_TIMELIMIT_LONG="-W 359 $LSF_ENV_ARGS"
 JC_TIMELIMIT_MERGE=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_NFILL=$JC_TIMELIMIT_LONG
