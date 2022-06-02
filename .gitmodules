@@ -3,4 +3,4 @@
 	url = https://github.com/soccin/FixMultiInDel.git
 [submodule "wes-filters"]
 	path = wes-filters
-	url = git@github.com:mskcc/wes-filters.git
+	url = git@github.com:soccin/wes-filters.git
