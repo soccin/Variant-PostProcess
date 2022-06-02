@@ -1,6 +1,8 @@
 # Variant-PostProcess (v3)
 
-## JUNO Version (2020-11-22)
+## JUNO Version (2022-06-02)
+
+Uses local SDIR/opt for old version of R (3.3.1); See opt.manifest for files if you need to recreate
 
 This version does not work properly. But for now this is the best solution so currently being used in production.
 
