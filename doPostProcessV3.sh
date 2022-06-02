@@ -20,8 +20,6 @@ JC_TIMELIMIT_CFILL=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_NFILL=$JC_TIMELIMIT_LONG
 JC_TIMELIMIT_MAFANNO=$JC_TIMELIMIT_LONG
 
-FACETS_SUITE=/opt/common/CentOS_6/facets-suite/facets-suite-1.0.1
-
 WESFBIN=$SDIR/wes-filters
 #POSTRESDIR=/ifs/res/share/pwg/
 POSTRESDIR=/juno/res/bic/shared/pwg
@@ -214,11 +212,18 @@ cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
     | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
 
+
+FACETS_SUITE=$SDIR/facets-suite
+
+echo \$R_LIBS=$R_LIBS
+
 bsub  ${JC_TIMELIMIT_MAFANNO} -o LSF.FACETS/ -J ${LSFTAG}_FACETS -R "rusage[mem=40]" \
-$FACETS_SUITE/facets mafAnno \
-    -m ${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf\
-    -f _facets_mapping_fixed.txt \
-    -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3b.maf
+    R_LIBS=/home/socci/lib/R/CentOS7/4.1.2 \
+      /juno/work/bic/socci/opt/common/CentOS_7/R/R-4.1.2/bin/Rscript \
+        $FACETS_SUITE/annotate-maf-wrapper.R -p TRUE \
+            --maf-file ${PROJECTNO}___SOMATIC.vep.filtered.V3b.maf \
+            -s _facets_mapping_fixed.txt \
+            -o ${PROJECTNO}___SOMATIC.vep.filtered.facets.V3b.maf
 
 EXIT=$?
 
