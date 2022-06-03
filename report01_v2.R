@@ -52,6 +52,6 @@ if(exists("coverage")) {
     report01=facets
 }
 
-projNo=grep("Proj_",strsplit(args,"/")[[1]],value=T) %>% gsub("Proj","proj",.)
+projNo=grep("Proj_",strsplit(args,"/")[[1]],value=T)
 
 write.xlsx(report01,cc(projNo,"_Report01.xlsx"))
