@@ -236,3 +236,11 @@ if [ "$EXIT" != "0" ]; then
     exit $EXIT
 fi
 
+#
+# Post Processing Reports
+#
+
+R_LIBS=/home/socci/lib/R/CentOS7/4.1.2 \
+      /juno/work/bic/socci/opt/common/CentOS_7/R/R-4.1.2/bin/Rscript --no-save \
+        $SDIR/report01_v2.R $PIPELINEDIR &
+
