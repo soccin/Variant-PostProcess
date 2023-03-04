@@ -209,7 +209,7 @@ cat ___FILLOUT.maf | awk -F"\t" '$5 !~ /GL/{print $0}' >${PROJECTNO}___FILLOUT.V
 #
 
 cat $PIPELINEDIR/variants/copyNumber/facets/facets_mapping.txt \
-    | perl -pe "s|/ifs/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
+    | perl -pe "s|/.*variants/copyNumber/facets/|"$PIPELINEDIR"/variants/copyNumber/facets/|" \
     > _facets_mapping_fixed.txt
 
 
